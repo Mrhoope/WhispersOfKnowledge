@@ -12,7 +12,8 @@ main        <- hanya versi stabil / rilis
     ├── feature/world
     ├── feature/ui
     ├── feature/audio
-    └── ...
+    ├── chore/project-structure
+    └── docs/readme-contributing
 ```
 
 - Jangan commit langsung ke `main` atau `develop`.
