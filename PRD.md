@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.2\
+**Versi:** 1.3\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -14,6 +14,25 @@
 **Perspektif:** 2D Top-Down\
 **Dunia:** Open-world exploration\
 **Combat:** Tidak ada
+
+------------------------------------------------------------------------
+
+# Riwayat Revisi
+
+**v1.3**
+-   Struktur proyek (14.1) disesuaikan dengan repository nyata: root repo berisi dokumentasi dan satu folder sketch Processing. Folder `src/` tidak dipakai.
+-   Nama branch (16.1) disesuaikan dengan branch yang dipakai tim.
+-   Tombol `Q` ditambahkan untuk Quest Log (5.2).
+-   Objective *The Forgotten Garden* diperbaiki: crafting menjadi objective, "Menyelesaikan quest" bukan lagi objective (8.3).
+-   Dialog dengan pilihan jawaban langsung didukung (9, 14.2).
+-   Kontrak Save mencakup pesan hasil yang jelas (14.2).
+-   Class pendukung ditambahkan ke daftar class (14.2): Camera, DialogueSystem, UI.
+-   Format data diputuskan: JSON dengan `JSONObject` bawaan Processing (14.3).
+-   Audio ditetapkan menjadi tanggung jawab Anggota 4 (15).
+-   Urutan fase tetap, dengan catatan bahwa UI dasar dibuat bersama fiturnya (12, 19).
+
+**v1.2**
+-   Versi revisi sebelumnya.
 
 ------------------------------------------------------------------------
 
@@ -92,7 +111,7 @@ permainan.
   Version control                  Git
   Remote repository                GitHub
   Format gambar                    PNG
-  Format data                      JSON, jika diperlukan
+  Format data                      JSON (JSONObject bawaan Processing)
   Dokumentasi                      Markdown
   Platform target                  Windows PC
 
@@ -106,6 +125,7 @@ permainan.
 -   Aset visual dibuat menggunakan AI image generation dan diproses agar
     sesuai kebutuhan game.
 -   Tim menggunakan versi Processing dan struktur proyek yang sama.
+    Nomor versi persisnya dicatat di `README.md`.
 -   Target performa awal adalah 60 FPS, tetapi harus diuji pada
     perangkat tim.
 
@@ -146,7 +166,12 @@ dengan konfigurasi Java/Processing yang disepakati bersama.
   E                 Interaksi
   J                 Membuka Journal
   I                 Membuka Inventory
+  Q                 Membuka Quest Log
   ESC               Pause
+
+Saat dialog dengan pilihan jawaban terbuka: W/S (atau panah atas/bawah)
+memilih jawaban dan E mengonfirmasi. Saat dialog atau layar penuh
+terbuka, ESC menutupnya.
 
 Kontrol dapat disesuaikan setelah prototype diuji.
 
@@ -258,7 +283,10 @@ eksplorasi tanpa tekanan.
 
 Objective: 1. Berbicara dengan penjaga taman. 2. Menjelajahi hutan. 3.
 Menemukan tiga jenis tanaman. 4. Mengumpulkan bahan yang dibutuhkan. 5.
-Kembali kepada penjaga taman. 6. Menyelesaikan quest.
+Melakukan crafting. 6. Kembali kepada penjaga taman.
+
+Quest berstatus `COMPLETED` setelah seluruh objective selesai. Reward
+diberikan satu kali saja saat quest selesai.
 
 Reward: - Journal entry. - Resep crafting. - Item dalam game.
 
@@ -274,6 +302,11 @@ sederhana. - Informasi edukasi. - Penerimaan quest.
 
 Sistem hubungan NPC lanjutan tidak termasuk MVP. Jika dibutuhkan, status
 awal dapat berupa Stranger, Acquaintance, dan Friend.
+
+Dialog disusun sebagai rangkaian baris yang saling menunjuk lewat
+indeks. Sebuah baris dapat memiliki pilihan jawaban dan aksi (misalnya
+memulai quest atau membuka entry Journal). Format lengkapnya ada di
+`TECHNICAL_SPEC.md`.
 
 ------------------------------------------------------------------------
 
@@ -322,6 +355,11 @@ Screen. 5. Journal Screen. 6. Quest Log. 7. Pause Menu. 8. Notification.
 
 UI harus mudah dibaca, konsisten dengan gaya pixel art, dan tidak
 menghalangi area permainan secara berlebihan.
+
+Tampilan dasar (HUD, Dialogue Box, layar Inventory, Journal, Quest Log,
+dan Pause) dibuat bersama fitur yang membutuhkannya. Main Menu dan
+Crafting Interface dikerjakan di Fase 6. Quest Log dibuka dengan tombol
+`Q`.
 
 ------------------------------------------------------------------------
 
@@ -400,46 +438,42 @@ otomatis bebas dari pembatasan.
 
 # 14. Arsitektur Teknis
 
-## 14.1 Struktur proyek yang direncanakan
+## 14.1 Struktur proyek
+
+Root repository berisi dokumentasi dan satu folder sketch Processing:
 
 ``` text
-WhispersOfKnowledge/
-├── WhispersOfKnowledge.pde
+WhispersOfKnowledge/                  <- root repository
 ├── README.md
 ├── PRD.md
+├── AI_INSTRUCTION.md
 ├── TECHNICAL_SPEC.md
 ├── CONTRIBUTING.md
 ├── .gitignore
-├── src/
-│   ├── core/
-│   ├── player/
-│   ├── world/
-│   ├── npc/
-│   ├── quest/
-│   ├── inventory/
-│   ├── crafting/
-│   ├── journal/
-│   ├── ui/
-│   └── save/
-├── data/
-│   ├── sprites/
-│   ├── tilesets/
-│   ├── maps/
-│   ├── audio/
-│   └── game-data/
+├── .github/
 ├── docs/
+│   ├── TEAM_TASKS.md
 │   ├── DEVELOPMENT_LOG.md
 │   ├── ASSET_CREDITS.md
 │   └── TESTING.md
-└── saves/
+└── WhispersOfKnowledge/              <- folder sketch Processing
+    ├── WhispersOfKnowledge.pde       <- file utama
+    ├── Game.pde   Camera.pde   Player.pde   World.pde
+    ├── NPC.pde   DialogueSystem.pde   UI.pde
+    ├── QuestManager.pde   Inventory.pde   CraftingSystem.pde
+    ├── Journal.pde   SaveManager.pde
+    ├── data/
+    │   ├── sprites/  tilesets/  maps/
+    │   └── audio/    ui/        game-data/
+    └── saves/                        <- file save, tidak masuk Git
 ```
 
-**Catatan Processing:** Untuk tahap awal, struktur implementasi yang
-paling sederhana adalah satu folder sketch Processing dengan beberapa
-tab `.pde`. Folder `src` di atas adalah rancangan organisasi modul dan
-tidak otomatis menjadi source folder yang dikenali Processing IDE. Jika
-tim menggunakan VS Code dengan Java project, konfigurasi Processing Core
-dan source path harus disiapkan secara eksplisit.
+**Catatan Processing:** Processing hanya mengenali file `.pde` di folder
+sketch (satu class per tab) dan aset di folder `data/`. Folder `src/` pada
+rancangan awal tidak dipakai. Nama file utama harus sama dengan nama folder
+sketch. Jika tim kelak memakai VS Code dengan Java project, konfigurasi
+Processing Core dan source path harus disiapkan secara eksplisit. Folder
+`saves/` dibuat saat game menyimpan dan masuk `.gitignore`.
 
 ## 14.2 Class utama
 
@@ -467,12 +501,16 @@ dan source path harus disiapkan secara eksplisit.
 -   `render()`
 -   `isNear()`
 -   `interact()`
+-   `getDialogue()`
 
 ### `QuestManager`
 
 -   `addQuest()`
+-   `unlockQuest()`
 -   `startQuest()`
+-   `completeObjective()`
 -   `completeQuest()`
+-   `claimReward()`
 -   `getQuest()`
 
 ### `Inventory`
@@ -488,13 +526,24 @@ dan source path harus disiapkan secara eksplisit.
 
 ### `Journal`
 
+-   `registerEntry()`
+-   `discover()`
 -   `addEntry()`
 -   `hasEntry()`
+-   `getDiscovered()`
 
 ### `SaveManager`
 
 -   `saveGame()`
 -   `loadGame()`
+-   `getLastMessage()`
+
+### Class pendukung
+
+-   `Camera`: `follow()`, `apply()`, `getX()`, `getY()`.
+-   `DialogueSystem`: `start()`, `confirm()`, `moveSelection()`, `pollAction()`, `isOpen()`, `close()`.
+-   `UI`: menggambar HUD, dialog, Inventory, Journal, Quest Log, Pause, dan notifikasi.
+-   Class data: `Quest`, `ItemData`, `Recipe`, `JournalEntry`, `DialogueLine`.
 
 Kontrak parameter dan tipe data harus ditetapkan dalam dokumen Technical
 Specification sebelum coding paralel.
@@ -502,8 +551,10 @@ Specification sebelum coding paralel.
 ## 14.3 Pengelolaan data
 
 Data quest, item, NPC, dan resep sebaiknya dipisahkan dari logika
-program jika memungkinkan. JSON dapat digunakan setelah tim memilih
-library dan menguji pembacaannya di Processing.
+program jika memungkinkan. Format data adalah JSON memakai `JSONObject` dan
+`JSONArray` bawaan Processing, sehingga tidak diperlukan library
+tambahan. Selama prototype, data contoh masih ditulis langsung di
+`Game.pde` dan dipindahkan ke `data/game-data/` secara bertahap.
 
 ------------------------------------------------------------------------
 
@@ -531,7 +582,8 @@ Dialogue. - Journal. - UI.
 
 Tanggung jawab: - AI-generated character assets. - AI-generated NPC
 assets. - AI-generated environment assets. - Tileset preparation. - Map
-layout. - Asset documentation. - Visual quality assurance.
+layout. - Asset documentation. - Visual quality assurance. - Audio
+(Should Have).
 
 Pembagian dapat disesuaikan setelah kemampuan anggota berkembang.
 
@@ -544,10 +596,14 @@ Pembagian dapat disesuaikan setelah kemampuan anggota berkembang.
 ``` text
 main
 └── develop
-    ├── feature/player-world
-    ├── feature/inventory-crafting
-    ├── feature/npc-journal-ui
-    └── feature/ai-assets
+    ├── feature/core
+    ├── feature/player
+    ├── feature/world
+    ├── feature/ui
+    ├── feature/audio
+    ├── feature/inventory-crafting   (dibuat saat dibutuhkan)
+    ├── feature/npc-journal          (dibuat saat dibutuhkan)
+    └── feature/ai-assets            (dibuat saat dibutuhkan)
 ```
 
 ## 16.2 Aturan pengembangan
@@ -649,6 +705,7 @@ MVP adalah versi minimum yang harus selesai sebelum memperluas dunia.
 -   NPC terlihat di dunia.
 -   Pemain dapat berinteraksi dalam jarak tertentu.
 -   Dialogue dapat dibuka dan ditutup.
+-   Pilihan jawaban dapat dipilih dan menentukan kelanjutan dialog.
 
 ## Quest
 
@@ -692,6 +749,8 @@ MVP adalah versi minimum yang harus selesai sebelum memperluas dunia.
 
 # 19. Roadmap Pengembangan
 
+Tiap fase harus lulus pengujian sebelum fase berikutnya dianggap selesai.
+
 ## Phase 1 --- Foundation
 
 -   Setup repository.
@@ -732,7 +791,7 @@ MVP adalah versi minimum yang harus selesai sebelum memperluas dunia.
 ## Phase 6 --- Integration
 
 -   Save/load.
--   UI.
+-   UI (penyempurnaan, Main Menu, Crafting Interface).
 -   Audio.
 -   Integration testing.
 
@@ -772,7 +831,7 @@ Setiap fitur harus diuji sebelum Pull Request digabungkan ke `develop`.
 AI coding agent bertindak sebagai asisten pengembangan.
 
 Aturan: 1. Gunakan Processing 4 Java Mode. 2. Gunakan Java sebagai
-bahasa utama. 3. Ikuti PRD dan Technical Specification. 4. Jangan
+bahasa utama. 3. Ikuti PRD, Technical Specification, dan `AI_INSTRUCTION.md`. 4. Jangan
 menggunakan Godot atau Unity. 5. Jangan menempatkan seluruh kode dalam
 satu file. 6. Ikuti kontrak class yang telah disepakati. 7. Berikan kode
 lengkap untuk file yang dibuat atau diubah. 8. Jelaskan lokasi file. 9.
@@ -780,11 +839,13 @@ Jelaskan cara menjalankan. 10. Jelaskan cara menguji. 11. Jangan
 mengubah file modul anggota lain tanpa kebutuhan. 12. Jangan menambahkan
 dependency tanpa penjelasan. 13. Jangan menganggap kode berhasil sebelum
 diuji. 14. Gunakan penjelasan yang mudah dipahami pemula. 15.
-Implementasikan fitur secara bertahap.
+Implementasikan fitur secara bertahap. 16. Jawab dalam Bahasa
+Indonesia.
 
 ## Format jawaban AI saat mengimplementasikan fitur
 
-Setiap implementasi harus mencakup: - Tujuan fitur. - Penjelasan
+Setiap implementasi harus mencakup: - Tujuan fitur. - Bagian PRD yang
+diimplementasikan. - Penjelasan
 teknis. - File yang dibuat. - File yang diubah. - Kode lengkap. -
 Instruksi integrasi. - Instruksi pengujian. - Batasan yang diketahui.
 
@@ -809,4 +870,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.2**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.3**

@@ -1,0 +1,10 @@
+# File save permainan
+saves/
+
+# Hasil kompilasi dan file editor
+*.class
+.vscode/
+
+# File sistem
+Thumbs.db
+.DS_Store

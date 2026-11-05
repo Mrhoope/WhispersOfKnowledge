@@ -12,8 +12,7 @@ main        <- hanya versi stabil / rilis
     ├── feature/world
     ├── feature/ui
     ├── feature/audio
-    ├── chore/project-structure
-    └── docs/readme-contributing
+    └── ...
 ```
 
 - Jangan commit langsung ke `main` atau `develop`.
@@ -69,6 +68,8 @@ Gunakan pesan yang jelas. Hindari pesan seperti `update` atau `fix bug`.
 - Ikuti kontrak class di `TECHNICAL_SPEC.md` (nama method dan parameter tidak boleh diubah sepihak).
 - Beri komentar singkat untuk logika yang tidak jelas.
 - Jangan menambah library atau dependency tanpa diskusi.
+- `import` hanya ditulis di `WhispersOfKnowledge.pde`. Folder `src/` tidak dipakai.
+- Perintah aksi dialog baru ditambahkan di `Game.runAction()` dan dicatat di `TECHNICAL_SPEC.md` bagian 4.
 
 ## 6. Aturan Aset (File Binary)
 
