@@ -4,7 +4,8 @@ Game edukasi **2D top-down pixel art adventure RPG** yang dibuat dengan **Proces
 
 Pemain menjelajahi dunia fantasi (desa, hutan, taman alkimia, perpustakaan), berbicara dengan NPC, menyelesaikan quest, dan melakukan crafting. Pembelajaran terjadi lewat aktivitas bermain, bukan sekadar tanya-jawab.
 
-> **Status:** Fase 1 (Foundation). Dokumen acuan: [PRD.md](PRD.md) v1.2
+> **Status:** Fase 1 selesai (kerangka sketch). Verifikasi Fase 2 (gerak, collision, kamera) sedang berjalan.
+> Dokumen acuan: [PRD.md](PRD.md) v1.3
 
 ## Fitur MVP
 
@@ -23,6 +24,7 @@ Fitur di luar MVP (combat, multiplayer, dll.) ada di PRD bagian 20.
 | Komponen | Pilihan |
 |---|---|
 | Engine | Processing 4 (Java Mode) |
+| Versi Processing | 4.x.x (isi versi yang dipakai tim) |
 | Bahasa | Java |
 | Editor | Visual Studio Code (alternatif: Processing IDE 4) |
 | Version control | Git + GitHub |
@@ -50,6 +52,8 @@ Fitur di luar MVP (combat, multiplayer, dll.) ada di PRD bagian 20.
 | E | Interaksi |
 | J | Journal |
 | I | Inventory |
+| Q | Quest Log |
+| W/S saat dialog | Memilih jawaban |
 | ESC | Pause |
 
 ## Struktur Proyek
@@ -59,7 +63,9 @@ WhispersOfKnowledge/                  <- root repo
 ├── README.md
 ├── PRD.md
 ├── AI_INSTRUCTION.md
+├── TECHNICAL_SPEC.md
 ├── CONTRIBUTING.md
+├── .gitignore
 ├── docs/
 │   ├── TEAM_TASKS.md
 │   ├── DEVELOPMENT_LOG.md
@@ -67,6 +73,9 @@ WhispersOfKnowledge/                  <- root repo
 │   └── TESTING.md
 └── WhispersOfKnowledge/              <- folder sketch Processing
     ├── WhispersOfKnowledge.pde
+    ├── Game  Camera  Player  World          (.pde)
+    ├── NPC  DialogueSystem  UI              (.pde)
+    ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  (.pde)
     └── data/
         ├── sprites/  tilesets/  maps/
         └── audio/    ui/        game-data/
@@ -77,6 +86,7 @@ Catatan: Processing hanya mengenali file `.pde` di folder sketch dan aset di `da
 ## Dokumentasi
 
 - [PRD.md](PRD.md): kebutuhan produk
+- [TECHNICAL_SPEC.md](TECHNICAL_SPEC.md): kontrak class
 - [CONTRIBUTING.md](CONTRIBUTING.md): aturan kolaborasi tim
 - [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md): pembagian tugas
 - [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md): catatan aset AI

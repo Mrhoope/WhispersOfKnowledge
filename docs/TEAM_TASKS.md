@@ -22,8 +22,9 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | Fase | Tugas |
 |---|---|
 | 1 | Struktur repo, README, CONTRIBUTING, `TECHNICAL_SPEC.md` (kontrak class), kerangka `Game` |
-| 4 | `QuestManager` (status LOCKED, AVAILABLE, ACTIVE, COMPLETED) |
-| 6 | `SaveManager` (saveGame, loadGame) dan integrasi seluruh sistem |
+| 3 | `Game`: state permainan dan `runAction()` yang menghubungkan dialog dengan quest, item, journal |
+| 4 | `QuestManager` (status, objective, `claimReward`) |
+| 6 | `SaveManager` (saveGame, loadGame, getLastMessage) dan integrasi seluruh sistem |
 | 7 | Bug fixing, build final |
 
 ## Anggota 2: Player & World Programmer
@@ -33,7 +34,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | Fase | Tugas |
 |---|---|
 | 2 | `Player` (gerak 4 arah, update, render) |
-| 2 | Camera mengikuti pemain |
+| 2 | `Camera` (follow, apply) |
 | 2 | `World` (render tile map, `isBlocked()`), collision, batas area |
 | 5 | Memuat map Greenhaven Village dan Whispering Forest bersama Anggota 4 |
 
@@ -43,11 +44,11 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 
 | Fase | Tugas |
 |---|---|
-| 3 | `NPC` (render, `isNear()`, `interact()`) dan dialogue box |
+| 3 | `NPC` dan `DialogueSystem` (dialog bertahap dengan pilihan jawaban), dialogue box di `UI` |
 | 4 | `Inventory` (add, remove, has, quantity tidak boleh negatif) |
 | 4 | `CraftingSystem` (cek bahan sebelum mengurangi item) |
-| 4 | `Journal` (addEntry, hasEntry) |
-| 6 | UI: Main Menu, HUD, Inventory Screen, Journal Screen, Quest Log, Pause, Notification |
+| 4 | `Journal` (registerEntry, discover, addEntry, hasEntry) |
+| 6 | Menyempurnakan `UI` dan menambah Main Menu dan Crafting Interface (HUD, Inventory, Journal, Quest Log, Pause, Notification dasar sudah ada) |
 
 ## Anggota 4: AI Asset & World Designer
 
@@ -75,4 +76,6 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 - [ ] README dan CONTRIBUTING ter-merge
 - [ ] Semua anggota berhasil clone repo dan menjalankan sketch kosong
 - [ ] `TECHNICAL_SPEC.md` (kontrak class) disepakati
+- [ ] Kerangka sketch berjalan di Processing 4 pada perangkat semua anggota
+- [ ] Verifikasi Fase 2: gerak, collision, dan kamera berfungsi
 - [ ] Anggota 4 menguji 1 sprite dan 1 tile AI di Processing
