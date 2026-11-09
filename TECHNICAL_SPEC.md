@@ -1,6 +1,6 @@
 # Technical Specification: Whispers of Knowledge
 
-Versi 1.1. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.3 bagian 14.
+Versi 1.2. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.4 bagian 14.
 
 > Aturan: kontrak tidak boleh diubah sepihak. Jika perlu perubahan, diskusikan dulu, update dokumen ini, baru ubah kode.
 
@@ -31,7 +31,7 @@ Nilai default: window 960x540, target 60 FPS, `noSmooth()` aktif agar pixel art 
 
 ### 3.1 `Game` dan `GameState` (Anggota 1)
 
-`GameState`: `PLAYING`, `DIALOGUE`, `INVENTORY`, `JOURNAL`, `QUEST_LOG`, `PAUSED`.
+`GameState`: `PLAYING`, `DIALOGUE`, `INVENTORY`, `JOURNAL`, `QUEST_LOG`, `CRAFTING`, `PAUSED`.
 
 | Method | Keterangan |
 |---|---|
@@ -40,8 +40,10 @@ Nilai default: window 960x540, target 60 FPS, `noSmooth()` aktif agar pixel art 
 | `void render()` | Menggambar dunia lewat kamera, lalu UI sesuai state |
 | `void keyPressed()` / `void keyReleased()` | Menerima input keyboard |
 | `void runAction(String command)` | Menjalankan satu perintah aksi dialog (lihat bagian 4) |
+| `void checkQuestProgress()` | Memeriksa kondisi semua objective quest utama dan menandai yang terpenuhi. Dipanggil setelah pickup, crafting, masuk hutan, dan dialog |
+| `String getInteractPrompt()` | Teks petunjuk interaksi terdekat, `null` jika tidak ada |
 
-Field: `world`, `camera`, `player`, `npcs`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`.
+Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`.
 
 ### 3.2 `Camera` (Anggota 2)
 
@@ -70,6 +72,7 @@ Field: `world`, `camera`, `player`, `npcs`, `inventory`, `journal`, `quests`, `c
 | `void render(float camX, float camY, float viewW, float viewH)` | Menggambar hanya tile yang terlihat |
 | `boolean isBlocked(int tileX, int tileY)` | `true` jika tile menghalangi atau di luar map |
 | `boolean isBlockedPx(float px, float py)` | Sama, dalam pixel dunia |
+| `boolean isForest(int tileX, int tileY)` / `boolean isForestPx(float px, float py)` | `true` jika berada di zona Whispering Forest (tile x >= 20 dan y <= 14). Rumput hutan digambar sedikit lebih gelap |
 | `int getPixelWidth()` / `int getPixelHeight()` | Ukuran dunia dalam pixel |
 
 ### 3.5 `NPC` (Anggota 3)
@@ -82,6 +85,7 @@ Field: `world`, `camera`, `player`, `npcs`, `inventory`, `journal`, `quests`, `c
 | `boolean isNear(Player p)` | `true` jika pemain dalam jarak interaksi |
 | `void interact(DialogueSystem ds)` | Memulai dialog dengan NPC ini |
 | `DialogueLine[] getDialogue()` | Data dialog |
+| `void setDialogue(DialogueLine[] d)` | Mengganti dialog, misalnya sesuai progres quest |
 | `void markTalked()` / `int getTimesTalked()` | Status interaksi |
 | `String getId()` / `getName()` / `float getX()` / `getY()` | Getter |
 
@@ -112,15 +116,17 @@ UI hanya **menggambar**. Data dan logika tetap di class masing-masing.
 
 | Method | Keterangan |
 |---|---|
-| `void renderHud(QuestManager quests, boolean canInteract)` | Bar atas, quest aktif, prompt `[E] Bicara` |
+| `void renderHud(QuestManager quests, String prompt)` | Bar atas, quest aktif, tujuan berikutnya, dan prompt interaksi (`null` = tidak ada) |
 | `void renderDialogue(DialogueSystem dialogue)` | Kotak dialog dan pilihan jawaban |
 | `void renderInventory(Inventory inventory)` | Layar Inventory |
 | `void renderJournal(Journal journal)` | Layar Journal (hanya entry yang ditemukan) |
 | `void renderQuestLog(QuestManager quests)` | Layar Quest Log |
 | `void renderPause()` | Layar Pause |
-| `void showNotification(String message)` / `void renderNotification()` | Notifikasi 3 detik |
+| `void renderCrafting(CraftingSystem crafting, Inventory inv, int selected)` | Layar Crafting: resep terbuka, bahan (dimiliki/butuh), hasil |
+| `void showNotification(String message)` / `void renderNotification()` | Notifikasi 3,5 detik. Maksimal 3 bertumpuk, yang terlama dibuang |
+| `void scrollBy(int delta)` / `void resetScroll()` | Menggulir panel yang isinya panjang (Inventory, Journal, Quest Log) |
 
-Belum ada: Main Menu dan Crafting Interface (Fase 6).
+Belum ada: Main Menu (Fase 6).
 
 ### 3.8 `QuestManager` dan `Quest` (Anggota 1)
 
@@ -157,9 +163,12 @@ Belum ada: Main Menu dan Crafting Interface (Fase 6).
 | Method | Keterangan |
 |---|---|
 | `void addRecipe(Recipe r)` / `Recipe getRecipe(String id)` | Daftar resep |
-| `boolean craft(String recipeId, Inventory inv)` | Cek **semua** bahan dulu, baru kurangi. Gagal jika kurang, inventory tidak berubah |
+| `boolean unlockRecipe(String id)` | Membuka resep terkunci. `false` jika tidak ada atau sudah terbuka |
+| `ArrayList<Recipe> getUnlockedRecipes()` | Resep yang sudah terbuka, urut sesuai pendaftaran |
+| `boolean canCraft(String recipeId, Inventory inv)` | `true` jika resep terbuka dan semua bahan cukup. Tidak mengubah inventory |
+| `boolean craft(String recipeId, Inventory inv)` | Cek **semua** bahan dulu, baru kurangi. Gagal jika kurang atau resep terkunci, inventory tidak berubah |
 
-`Recipe`: `id`, `name`, `ingredientIds` (String[]), `ingredientQty` (int[]), `outputId`, `outputQty`.
+`Recipe`: `id`, `name`, `ingredientIds` (String[]), `ingredientQty` (int[]), `outputId`, `outputQty`, `unlocked` (boolean, default `true`).
 
 ### 3.11 `Journal` dan `JournalEntry` (Anggota 3)
 
@@ -186,6 +195,19 @@ Journal berisi katalog entry. Setiap entry punya status `discovered`.
 
 Masih stub (Fase 6). Format penyimpanan ada di bagian 7.
 
+### 3.13 `Pickup` (Anggota 3)
+
+Benda di dunia yang diambil dengan tombol E (tanaman, bahan, sumber air).
+
+| Method | Keterangan |
+|---|---|
+| `Pickup(String id, String name, String itemId, int quantity, float x, float y, boolean repeatable, String journalId, int r, int g, int b)` | `journalId` = entry Journal yang ditemukan saat diambil (`""` jika tidak ada). `r,g,b` = warna placeholder |
+| `boolean isAvailable()` | `true` jika `repeatable` atau belum diambil |
+| `boolean isNear(Player p)` | `true` jika tersedia dan pemain dalam jarak 24 pixel |
+| `void markCollected()` | Menandai sudah diambil (diabaikan jika `repeatable`) |
+| `void render()` | Menggambar (lingkaran placeholder). Tidak menggambar apa pun jika sudah diambil |
+| `getId()` / `getName()` / `getItemId()` / `getQuantity()` / `getJournalId()` / `getX()` / `getY()` | Getter |
+
 ## 4. Format Dialog dan Aksi
 
 Dialog adalah array `DialogueLine`. Contoh (penjaga taman):
@@ -209,8 +231,11 @@ DialogueLine[] talk = new DialogueLine[] {
 | `objective:<questId>:<indeks>` | Menandai objective selesai (indeks mulai dari 0) |
 | `give_item:<itemId>:<jumlah>` | Menambah item ke inventory |
 | `discover:<journalEntryId>` | Menandai entry Journal ditemukan |
+| `finish_quest:<questId>` | Menandai objective terakhir, menyelesaikan quest **jika semua objective selesai**, lalu memberi reward satu kali |
 
 Perintah baru ditambahkan di `Game.runAction()` dan didaftarkan di tabel ini.
+
+Dialog sebuah NPC dapat diganti sesuai progres lewat `NPC.setDialogue()`. Contoh: `Game.pickGardenerDialogue()` memilih salah satu dari empat dialog penjaga taman (belum menerima quest, quest aktif, siap kembali, quest selesai).
 
 ## 5. Kontrol
 
@@ -218,8 +243,8 @@ Perintah baru ditambahkan di `Game.runAction()` dan didaftarkan di tabel ini.
 |---|---|
 | W/A/S/D atau Panah | Bergerak |
 | E | Interaksi, lanjut dialog, konfirmasi pilihan |
-| W/S atau Panah atas/bawah (saat dialog) | Memilih jawaban |
-| I / J / Q | Inventory / Journal / Quest Log (tekan lagi untuk menutup) |
+| W/S atau Panah atas/bawah (saat dialog, Crafting, atau panel) | Memilih jawaban, memilih resep, atau menggulir |
+| I / J / Q / C | Inventory / Journal / Quest Log / Crafting (tekan lagi untuk menutup) |
 | ESC | Pause. Saat dialog atau layar terbuka: menutupnya |
 
 ## 6. Kepemilikan File
@@ -228,7 +253,7 @@ Perintah baru ditambahkan di `Game.runAction()` dan didaftarkan di tabel ini.
 |---|---|
 | `WhispersOfKnowledge.pde`, `Game.pde`, `QuestManager.pde`, `SaveManager.pde` | Anggota 1 |
 | `Player.pde`, `World.pde`, `Camera.pde` | Anggota 2 |
-| `NPC.pde`, `DialogueSystem.pde`, `UI.pde`, `Inventory.pde`, `CraftingSystem.pde`, `Journal.pde` | Anggota 3 |
+| `NPC.pde`, `DialogueSystem.pde`, `Pickup.pde`, `UI.pde`, `Inventory.pde`, `CraftingSystem.pde`, `Journal.pde` | Anggota 3 |
 
 Mengubah file milik anggota lain hanya setelah dikoordinasikan.
 
@@ -241,41 +266,68 @@ File `saves/save.json` di dalam folder sketch (masuk `.gitignore`), dibuat denga
   "version": 1,
   "player": { "x": 104.0, "y": 88.0 },
   "inventory": { "green_leaf": 2, "water": 1 },
-  "journal": ["plants_need_light"],
+  "journal": ["plants_need_light", "plant_green_leaf"],
   "quests": {
     "forgotten_garden": { "status": "ACTIVE", "done": [true, false, false, false, false, false], "rewardGiven": false }
   },
-  "npcTalked": { "npc_gardener": 3 }
+  "npcTalked": { "npc_gardener": 3 },
+  "forestVisited": true,
+  "pickupsCollected": ["pickup_leaf_1"],
+  "recipesUnlocked": ["herbal_tea", "garden_tonic"]
 }
 ```
 
-## 8. Kondisi Kerangka Saat Ini
+## 8. Skenario *The Forgotten Garden* (data contoh)
 
-Kerangka berisi:
+Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Data masih ditulis di `Game.setupContent()` dan dipindah ke `data/game-data/` secara bertahap.
 
-- Peta 40x30 tile (pohon, air, jalan) digenerate lewat kode
-- Pemain (kotak biru) bergerak 4 arah dengan collision, kamera mengikuti
-- Satu NPC penjaga taman (kotak oranye) dengan dialog bercabang
-- Inventory, Journal, Quest Log, dan Pause sebagai layar teks sederhana
-- Quest *The Forgotten Garden* beserta 6 objective
+**Objective dan pemicunya**
 
-Semua visual masih **placeholder**. Data contoh masih ditulis di `Game.setupDemoData()`.
+| # | Objective | Selesai ketika |
+|---|---|---|
+| 0 | Berbicara dengan penjaga taman | Menerima quest lewat dialog |
+| 1 | Menjelajahi Whispering Forest | Pemain masuk zona hutan (sudah pernah masuk sebelum quest pun dihitung) |
+| 2 | Menemukan tiga jenis tanaman | Journal memuat entry Daun Hijau, Sunpetal, dan Moon Fern |
+| 3 | Mengumpulkan bahan | Punya Green Leaf x2 dan Water x1 (atau sudah pernah crafting) |
+| 4 | Membuat Herbal Tea | Crafting Herbal Tea berhasil |
+| 5 | Kembali kepada penjaga taman | Dialog "siap kembali" memanggil `finish_quest` |
 
-**Status pengujian: belum dijalankan di Processing.** Verifikasi Fase 2 oleh tim masih diperlukan.
+**Letak benda (koordinat tile)**
+
+| Benda | Tile | Catatan |
+|---|---|---|
+| Pemain mulai | (5, 5) | |
+| Penjaga Taman | (12, 9) | |
+| Green Leaf | (22, 6) dan (24, 10) | Di hutan, masing-masing sekali ambil |
+| Sunpetal | (30, 8) | Di hutan |
+| Moon Fern | (34, 12) | Di hutan |
+| Air Kolam | (24, 20) | Di selatan jalan, tepi barat kolam, bisa diambil berulang |
+
+**Resep:** Herbal Tea = Green Leaf x2 + Water x1 (terbuka dari awal). Garden Tonic = Sunpetal + Moon Fern + Water (terkunci, dibuka sebagai reward).
+
+**Reward (sekali saja, lewat `claimReward`):** Garden Seed x1, resep Garden Tonic, entry Journal "Taman sebagai Ekosistem".
 
 ## 9. Cara Menguji
 
-1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run.
-2. **Gerak dan collision:** jalan dengan WASD. Pemain tidak boleh menembus pohon, air, atau batas peta. Kamera mengikuti dan berhenti di tepi peta.
-3. **Dialog:** dekati kotak oranye, muncul `[E] Bicara`. Tekan E sampai muncul dua pilihan. Tekan W/S untuk berpindah pilihan.
-4. **Pilih "Ya, aku akan membantu":** muncul notifikasi, quest aktif di pojok kanan atas.
-5. Tekan **Q**: Quest Log menampilkan objective pertama `[x]`. Tekan **J**: Journal berisi satu entry. Tekan **I**: Inventory berisi Green Leaf x2 dan Water x1.
-6. **ESC:** jeda. ESC saat dialog: dialog tertutup.
-7. Coba pilih "Nanti dulu": quest tetap belum dimulai.
+1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run. Di tab terlihat 14 file `.pde`.
+2. **Sebelum quest:** jalan ke timur melewati jalan cokelat sampai rumput lebih gelap. Notifikasi "Kamu memasuki Whispering Forest" muncul. Dekati lingkaran hijau di sekitar tile (22, 6): prompt `[E] Ambil Green Leaf`. Tekan E, masuk Inventory (I) dan Journal (J).
+3. Tekan **C**: layar Crafting menampilkan Herbal Tea dengan bahan `Green Leaf (1/2), Water (0/1)`. Tekan E: notifikasi "Bahan tidak cukup", inventory tidak berubah. Tekan C untuk menutup.
+4. **Terima quest:** dekati kotak oranye (penjaga taman), tekan E sampai muncul pilihan, pilih "Ya, aku akan membantu" dengan W/S lalu E. Cek Quest Log (Q): objective 1 dan 2 sudah `[x]`. Di kiri atas ada kotak "Tujuan: ..." yang mengikuti objective berikutnya.
+5. **Kumpulkan:** ambil Green Leaf kedua, Sunpetal, Moon Fern (objective tanaman selesai), lalu air di kolam. Air bisa diambil berulang.
+6. **Bicara sebelum siap:** dialog pengingat tampil ("Hutan ada di timur jalan...").
+7. **Crafting:** tekan C lalu E. Herbal Tea masuk inventory, bahan berkurang, notifikasi muncul, Journal bertambah entry resep.
+8. **Selesaikan:** bicara dengan penjaga taman. Dialog "Kamu membawa Herbal Tea!" tampil, quest selesai, dan muncul tiga notifikasi reward. Resep kedua (Garden Tonic) muncul di layar Crafting.
+9. **Reward tidak berulang:** bicara lagi dengan penjaga taman. Garden Seed tetap x1.
+10. Buka Journal: bila isinya panjang, W/S menggulir panel. ESC menutup dialog atau layar, atau menjeda permainan.
 
-## 10. Batasan yang Diketahui
+## 10. Status Pengujian dan Batasan
 
-- Dialog selalu mulai dari baris 0, jadi setelah quest diterima percakapan yang sama diulang (tanpa efek ganda).
-- Notifikasi baru menimpa yang lama bila muncul pada frame yang sama.
-- Belum ada tombol atau layar untuk crafting. Logikanya ada di `CraftingSystem`.
-- Teks panjang di panel tidak otomatis bergulir (scroll).
+**Pengujian:** logika alur lengkap (87 pemeriksaan: pickup, quest, crafting, reward sekali, dialog bercabang, gulir panel, render semua state) lulus dengan harness otomatis yang memakai stub API Processing. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
+
+**Batasan yang diketahui:**
+
+- Belum ada Save/Load. Progres `forestVisited`, pickup yang sudah diambil, dan resep terbuka harus ikut disimpan saat `SaveManager` dibuat (lihat bagian 7).
+- Quest utama masih memakai ID tetap (`forgotten_garden`) di `Game`. Side quest dan NPC lain butuh pengaturan umum (data JSON) di Fase 5.
+- Peta, zona hutan, dan letak benda masih ditulis di kode (placeholder).
+- Tidak ada pesan "inventory penuh" karena jumlah slot tidak dibatasi.
+- Layar Journal belum menampilkan entry yang belum ditemukan (sengaja disembunyikan).

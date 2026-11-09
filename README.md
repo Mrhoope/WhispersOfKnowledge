@@ -4,8 +4,8 @@ Game edukasi **2D top-down pixel art adventure RPG** yang dibuat dengan **Proces
 
 Pemain menjelajahi dunia fantasi (desa, hutan, taman alkimia, perpustakaan), berbicara dengan NPC, menyelesaikan quest, dan melakukan crafting. Pembelajaran terjadi lewat aktivitas bermain, bukan sekadar tanya-jawab.
 
-> **Status:** Fase 1 selesai (kerangka sketch). Verifikasi Fase 2 (gerak, collision, kamera) sedang berjalan.
-> Dokumen acuan: [PRD.md](PRD.md) v1.3
+> **Status:** Fase 2 terverifikasi. Skenario *The Forgotten Garden* dapat dimainkan dengan visual placeholder
+> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.4
 
 ## Fitur MVP
 
@@ -53,7 +53,8 @@ Fitur di luar MVP (combat, multiplayer, dll.) ada di PRD bagian 20.
 | J | Journal |
 | I | Inventory |
 | Q | Quest Log |
-| W/S saat dialog | Memilih jawaban |
+| C | Crafting |
+| W/S saat dialog, Crafting, atau panel | Memilih jawaban, memilih resep, atau menggulir |
 | ESC | Pause |
 
 ## Struktur Proyek
@@ -74,7 +75,7 @@ WhispersOfKnowledge/                  <- root repo
 └── WhispersOfKnowledge/              <- folder sketch Processing
     ├── WhispersOfKnowledge.pde
     ├── Game  Camera  Player  World          (.pde)
-    ├── NPC  DialogueSystem  UI              (.pde)
+    ├── NPC  DialogueSystem  Pickup  UI      (.pde)
     ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  (.pde)
     └── data/
         ├── sprites/  tilesets/  maps/

@@ -48,6 +48,8 @@ class NPC {
   }
 
   DialogueLine[] getDialogue() { return dialogue; }
+  // Mengganti dialog, misalnya sesuai progres quest.
+  void setDialogue(DialogueLine[] newDialogue) { dialogue = newDialogue; }
   void markTalked()            { timesTalked++; }
   int getTimesTalked()         { return timesTalked; }
   String getId()               { return id; }
