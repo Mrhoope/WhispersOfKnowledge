@@ -9,6 +9,10 @@ class World {
   final int WATER = 2;  // menghalangi
   final int PATH = 3;
 
+  // Zona Whispering Forest (placeholder): tile x >= 20 dan y <= 14.
+  final int FOREST_MIN_TX = 20;
+  final int FOREST_MAX_TY = 14;
+
   int tilesWide, tilesHigh;
   int[][] tiles;
 
@@ -64,7 +68,11 @@ class World {
       fill(190, 160, 110);
       rect(px, py, TILE_SIZE, TILE_SIZE);
     } else {
-      fill(96, 160, 80);
+      if (isForest(px / TILE_SIZE, py / TILE_SIZE)) {
+        fill(78, 140, 68);   // rumput hutan sedikit lebih gelap
+      } else {
+        fill(96, 160, 80);
+      }
       rect(px, py, TILE_SIZE, TILE_SIZE);
       if (type == TREE) {
         fill(110, 75, 40);
@@ -79,6 +87,14 @@ class World {
     if (tileX < 0 || tileY < 0 || tileX >= tilesWide || tileY >= tilesHigh) return true;
     int t = tiles[tileX][tileY];
     return t == TREE || t == WATER;
+  }
+
+  boolean isForest(int tileX, int tileY) {
+    return tileX >= FOREST_MIN_TX && tileY <= FOREST_MAX_TY;
+  }
+
+  boolean isForestPx(float px, float py) {
+    return isForest(floor(px / TILE_SIZE), floor(py / TILE_SIZE));
   }
 
   boolean isBlockedPx(float px, float py) {

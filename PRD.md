@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.3\
+**Versi:** 1.4\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -18,6 +18,12 @@
 ------------------------------------------------------------------------
 
 # Riwayat Revisi
+
+**v1.4**
+-   Tombol `C` ditambahkan untuk membuka Crafting (5.2).
+-   Crafting Interface dasar dibuat bersama fitur crafting. Main Menu tetap di Fase 6 (12).
+-   Resep dapat terkunci dan dibuka sebagai reward quest (10.2).
+-   Class Pickup ditambahkan untuk benda yang dapat diambil di dunia (14.2).
 
 **v1.3**
 -   Struktur proyek (14.1) disesuaikan dengan repository nyata: root repo berisi dokumentasi dan satu folder sketch Processing. Folder `src/` tidak dipakai.
@@ -167,6 +173,7 @@ dengan konfigurasi Java/Processing yang disepakati bersama.
   J                 Membuka Journal
   I                 Membuka Inventory
   Q                 Membuka Quest Log
+  C                 Membuka Crafting
   ESC               Pause
 
 Saat dialog dengan pilihan jawaban terbuka: W/S (atau panah atas/bawah)
@@ -330,6 +337,9 @@ Contoh resep:
 Sistem harus memeriksa seluruh bahan sebelum mengurangi jumlah item.
 Jika bahan tidak cukup, crafting gagal tanpa mengubah inventory.
 
+Resep dapat berstatus terkunci dan dibuka sebagai reward quest. Crafting
+dibuka dengan tombol `C`.
+
 ------------------------------------------------------------------------
 
 # 11. Knowledge Journal
@@ -357,9 +367,9 @@ UI harus mudah dibaca, konsisten dengan gaya pixel art, dan tidak
 menghalangi area permainan secara berlebihan.
 
 Tampilan dasar (HUD, Dialogue Box, layar Inventory, Journal, Quest Log,
-dan Pause) dibuat bersama fitur yang membutuhkannya. Main Menu dan
-Crafting Interface dikerjakan di Fase 6. Quest Log dibuka dengan tombol
-`Q`.
+dan Pause) dibuat bersama fitur yang membutuhkannya, termasuk Crafting
+Interface dasar (tombol `C`). Main Menu dikerjakan di Fase 6. Quest Log
+dibuka dengan tombol `Q`.
 
 ------------------------------------------------------------------------
 
@@ -459,7 +469,7 @@ WhispersOfKnowledge/                  <- root repository
 └── WhispersOfKnowledge/              <- folder sketch Processing
     ├── WhispersOfKnowledge.pde       <- file utama
     ├── Game.pde   Camera.pde   Player.pde   World.pde
-    ├── NPC.pde   DialogueSystem.pde   UI.pde
+    ├── NPC.pde   DialogueSystem.pde   Pickup.pde   UI.pde
     ├── QuestManager.pde   Inventory.pde   CraftingSystem.pde
     ├── Journal.pde   SaveManager.pde
     ├── data/
@@ -523,6 +533,9 @@ Processing Core dan source path harus disiapkan secara eksplisit. Folder
 ### `CraftingSystem`
 
 -   `craft()`
+-   `canCraft()`
+-   `unlockRecipe()`
+-   `getUnlockedRecipes()`
 
 ### `Journal`
 
@@ -542,7 +555,8 @@ Processing Core dan source path harus disiapkan secara eksplisit. Folder
 
 -   `Camera`: `follow()`, `apply()`, `getX()`, `getY()`.
 -   `DialogueSystem`: `start()`, `confirm()`, `moveSelection()`, `pollAction()`, `isOpen()`, `close()`.
--   `UI`: menggambar HUD, dialog, Inventory, Journal, Quest Log, Pause, dan notifikasi.
+-   `UI`: menggambar HUD, dialog, Inventory, Journal, Quest Log, Crafting, Pause, dan notifikasi.
+-   `Pickup`: benda di dunia yang diambil dengan tombol E (tanaman, bahan, sumber air).
 -   Class data: `Quest`, `ItemData`, `Recipe`, `JournalEntry`, `DialogueLine`.
 
 Kontrak parameter dan tipe data harus ditetapkan dalam dokumen Technical
@@ -870,4 +884,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.3**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.4**

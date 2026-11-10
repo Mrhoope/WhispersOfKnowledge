@@ -45,8 +45,8 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | Fase | Tugas |
 |---|---|
 | 3 | `NPC` dan `DialogueSystem` (dialog bertahap dengan pilihan jawaban), dialogue box di `UI` |
-| 4 | `Inventory` (add, remove, has, quantity tidak boleh negatif) |
-| 4 | `CraftingSystem` (cek bahan sebelum mengurangi item) |
+| 4 | `Inventory` (add, remove, has, quantity tidak boleh negatif) dan `Pickup` (benda yang bisa diambil) |
+| 4 | `CraftingSystem` (cek bahan sebelum mengurangi item, resep terkunci) dan layar Crafting (tombol C) di `UI` |
 | 4 | `Journal` (registerEntry, discover, addEntry, hasEntry) |
 | 6 | Menyempurnakan `UI` dan menambah Main Menu dan Crafting Interface (HUD, Inventory, Journal, Quest Log, Pause, Notification dasar sudah ada) |
 
@@ -77,5 +77,6 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 - [ ] Semua anggota berhasil clone repo dan menjalankan sketch kosong
 - [ ] `TECHNICAL_SPEC.md` (kontrak class) disepakati
 - [ ] Kerangka sketch berjalan di Processing 4 pada perangkat semua anggota
-- [ ] Verifikasi Fase 2: gerak, collision, dan kamera berfungsi
+- [x] Verifikasi Fase 2: gerak, collision, dan kamera berfungsi
+- [ ] Verifikasi alur *The Forgotten Garden* sampai selesai (langkah di `TECHNICAL_SPEC.md` bagian 9)
 - [ ] Anggota 4 menguji 1 sprite dan 1 tile AI di Processing

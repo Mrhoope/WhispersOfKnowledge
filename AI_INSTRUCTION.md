@@ -1,7 +1,7 @@
 AI PROJECT INSTRUCTIONS
 
 Project: Whispers of Knowledge
-Version: 1.1 (aligned with PRD v1.3)
+Version: 1.2 (aligned with PRD v1.4)
 
 1. PROJECT IDENTITY
 
