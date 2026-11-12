@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.5\
+**Versi:** 1.7\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -18,6 +18,12 @@
 ------------------------------------------------------------------------
 
 # Riwayat Revisi
+
+**v1.7**
+-   Main Menu dibuat (12): Lanjutkan, Permainan Baru, Keluar. Dari layar Pause, `M` kembali ke Main Menu.
+
+**v1.6**
+-   Save/Load diimplementasikan: satu slot di `saves/save.json`, tombol `F5` simpan dan `F9` muat, serta `K`/`L` di layar Pause (5.2, 14.2). File simpanan yang rusak atau tidak cocok ditolak dengan pesan jelas tanpa mengubah game.
 
 **v1.5**
 -   Konten game (item, resep, journal, quest, dialog, NPC, pickup) dan peta dipindahkan dari kode ke file JSON di `data/game-data/` dan `data/maps/` (14.1, 14.3). Format di `docs/DATA_FORMAT.md`.
@@ -180,6 +186,8 @@ dengan konfigurasi Java/Processing yang disepakati bersama.
   Q                 Membuka Quest Log
   C                 Membuka Crafting
   ESC               Pause
+  F5 / F9           Simpan / Muat
+  K / L / M         Di layar Pause: Simpan / Muat / Main Menu
 
 Saat dialog dengan pilihan jawaban terbuka: W/S (atau panah atas/bawah)
 memilih jawaban dan E mengonfirmasi. Saat dialog atau layar penuh
@@ -373,7 +381,7 @@ menghalangi area permainan secara berlebihan.
 
 Tampilan dasar (HUD, Dialogue Box, layar Inventory, Journal, Quest Log,
 dan Pause) dibuat bersama fitur yang membutuhkannya, termasuk Crafting
-Interface dasar (tombol `C`). Main Menu dikerjakan di Fase 6. Quest Log
+Interface dasar (tombol `C`). Main Menu dasar sudah ada (Lanjutkan, Permainan Baru, Keluar). Quest Log
 dibuka dengan tombol `Q`.
 
 ------------------------------------------------------------------------
@@ -554,6 +562,7 @@ Processing Core dan source path harus disiapkan secara eksplisit. Folder
 
 -   `saveGame()`
 -   `loadGame()`
+-   `hasSave()`
 -   `getLastMessage()`
 
 ### Class pendukung
@@ -891,4 +900,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.5**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.7**

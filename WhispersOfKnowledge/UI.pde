@@ -252,11 +252,57 @@ class UI {
     drawFooter("W/S pilih  |  E buat  |  C tutup");
   }
 
-  void renderPause() {
+  void renderPause(boolean hasSave) {
     ArrayList<String> rows = new ArrayList<String>();
     rows.add("Permainan dijeda.");
+    rows.add("");
+    rows.add("[K] Simpan permainan   (di luar jeda: F5)");
+    rows.add(hasSave ? "[L] Muat permainan   (di luar jeda: F9)"
+                     : "[L] Muat permainan   (belum ada data simpanan)");
+    rows.add("");
+    rows.add("[M] Kembali ke Menu Utama   (progres yang belum disimpan hilang)");
+    rows.add("");
     rows.add("Tekan ESC untuk melanjutkan.");
     drawPanel("Pause", rows, "ESC: lanjut");
+  }
+
+  // Main Menu: Lanjutkan, Permainan Baru, Keluar.
+  void renderMenu(int selected, boolean hasSave) {
+    fill(255, 230, 140);
+    textAlign(CENTER, TOP);
+    textSize(40);
+    text("Whispers of Knowledge", width / 2, 110);
+    fill(190);
+    textSize(14);
+    text("Petualangan belajar di dunia yang terlupakan", width / 2, 165);
+
+    String[] labels = {"Lanjutkan", "Permainan Baru", "Keluar"};
+    for (int i = 0; i < labels.length; i++) {
+      boolean enabled = (i != 0) || hasSave;
+      float y = 240 + i * 46;
+      if (i == selected) {
+        fill(255, 230, 140, 60);
+        stroke(255, 230, 140);
+        rect(width / 2 - 140, y - 8, 280, 38, 8);
+        noStroke();
+      }
+      if (!enabled) fill(110);
+      else if (i == selected) fill(255);
+      else fill(210);
+      textSize(20);
+      textAlign(CENTER, TOP);
+      text(labels[i], width / 2, y);
+    }
+    if (!hasSave) {
+      fill(130);
+      textSize(12);
+      text("Belum ada data simpanan.", width / 2, 240 + 3 * 46);
+    }
+
+    fill(160);
+    textSize(12);
+    textAlign(CENTER, BOTTOM);
+    text("W/S: pilih    E: konfirmasi", width / 2, height - 30);
   }
 
   // ---------- Pembantu ----------

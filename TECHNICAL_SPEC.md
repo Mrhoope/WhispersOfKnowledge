@@ -1,6 +1,6 @@
 # Technical Specification: Whispers of Knowledge
 
-Versi 1.3. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.5 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
+Versi 1.5. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.7 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
 
 > Aturan: kontrak tidak boleh diubah sepihak. Jika perlu perubahan, diskusikan dulu, update dokumen ini, baru ubah kode.
 
@@ -31,11 +31,15 @@ Nilai default: window 960x540, target 60 FPS, `noSmooth()` aktif agar pixel art 
 
 ### 3.1 `Game` dan `GameState` (Anggota 1)
 
-`GameState`: `PLAYING`, `DIALOGUE`, `INVENTORY`, `JOURNAL`, `QUEST_LOG`, `CRAFTING`, `PAUSED`.
+`GameState`: `MENU` (state awal), `PLAYING`, `DIALOGUE`, `INVENTORY`, `JOURNAL`, `QUEST_LOG`, `CRAFTING`, `PAUSED`.
 
 | Method | Keterangan |
 |---|---|
-| `Game()` | Membuat semua sistem, memuat semua konten lewat `DataLoader.loadAll(this)`, membuat Player di posisi awal peta |
+| `Game()` | Memanggil `init()` |
+| `void init()` | Membuat semua sistem dari awal, memuat semua konten lewat `DataLoader.loadAll(this)`, membuat Player di posisi awal peta, state `MENU`. Juga dipakai untuk reset penuh, sehingga tidak ada sisa progres lama |
+| `void startNewGame()` | `init()` lalu state `PLAYING` |
+| `void menuConfirm()` | Menjalankan pilihan Main Menu: 0 Lanjutkan (`loadGame`), 1 Permainan Baru, 2 Keluar (`exit()`) |
+| `void backToMenu()` | Dari Pause kembali ke Main Menu lewat `init()` (progres yang belum disimpan hilang) |
 | `void update()` | Dipanggil tiap frame. Hanya menggerakkan pemain saat state `PLAYING` |
 | `void render()` | Menggambar dunia lewat kamera, lalu UI sesuai state |
 | `void keyPressed()` / `void keyReleased()` | Menerima input keyboard |
@@ -46,7 +50,7 @@ Nilai default: window 960x540, target 60 FPS, `noSmooth()` aktif agar pixel art 
 | `boolean isTriggerMet(Trigger t)` | Menilai satu trigger objective (lihat DATA_FORMAT.md) |
 | `String getInteractPrompt()` | Teks petunjuk interaksi terdekat, `null` jika tidak ada |
 
-Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`, `dialogueSets` (`HashMap<String, DialogueLine[]>`), `visitedZones` (`HashSet<String>`), `dataErrors` (`ArrayList<String>`).
+Field: `menuSelected` (0 sampai 2), `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`, `dialogueSets` (`HashMap<String, DialogueLine[]>`), `visitedZones` (`HashSet<String>`), `dataErrors` (`ArrayList<String>`).
 
 `Game` **tidak lagi menulis konten**. Item, resep, quest, dialog, NPC, dan pickup dibaca dari `data/` oleh `DataLoader` (bagian 3.14).
 
@@ -132,13 +136,13 @@ UI hanya **menggambar**. Data dan logika tetap di class masing-masing.
 | `void renderInventory(Inventory inventory)` | Layar Inventory |
 | `void renderJournal(Journal journal)` | Layar Journal (hanya entry yang ditemukan) |
 | `void renderQuestLog(QuestManager quests)` | Layar Quest Log |
-| `void renderPause()` | Layar Pause |
+| `void renderPause(boolean hasSave)` | Layar Pause: petunjuk `[K] Simpan`, `[L] Muat`, `[M] Menu Utama`, serta status ada tidaknya data simpanan |
 | `void renderCrafting(CraftingSystem crafting, Inventory inv, int selected)` | Layar Crafting: resep terbuka, bahan (dimiliki/butuh), hasil |
 | `void showNotification(String message)` / `void renderNotification()` | Notifikasi 3,5 detik. Maksimal 3 bertumpuk, yang terlama dibuang |
 | `void scrollBy(int delta)` / `void resetScroll()` | Menggulir panel yang isinya panjang (Inventory, Journal, Quest Log) |
 | `void renderDataErrors(ArrayList<String> errors)` | Kotak merah berisi maksimal 4 pesan masalah data (kosong = tidak digambar) |
 
-Belum ada: Main Menu (Fase 6).
+| `void renderMenu(int selected, boolean hasSave)` | Main Menu: judul, tiga pilihan, "Lanjutkan" diredupkan bila belum ada simpanan |
 
 ### 3.8 `QuestManager` dan `Quest` (Anggota 1)
 
@@ -204,11 +208,12 @@ Journal berisi katalog entry. Setiap entry punya status `discovered`.
 
 | Method | Keterangan |
 |---|---|
-| `boolean saveGame(Game game)` | `false` jika gagal |
-| `boolean loadGame(Game game)` | `false` jika file tidak ada atau rusak, state game **tidak berubah** |
+| `boolean saveGame(Game game)` | `false` jika gagal. Menulis ke `saves/save.tmp` dulu, lalu menggantikan `save.json`, sehingga file lama tidak rusak bila penulisan gagal |
+| `boolean loadGame(Game game)` | `false` jika file tidak ada, rusak, atau tidak cocok dengan data game. File diperiksa **seluruhnya** dulu; state game **tidak berubah** bila ada masalah |
+| `boolean hasSave()` | `true` jika `saves/save.json` ada |
 | `String getLastMessage()` | Pesan hasil terakhir yang jelas, ditampilkan lewat `UI.showNotification()` |
 
-Masih stub (Fase 6). Format penyimpanan ada di bagian 7.
+Format penyimpanan ada di bagian 7. `Game.quickSave()` dan `Game.quickLoad()` memanggilnya dan hanya bekerja saat state `PLAYING` atau `PAUSED` (dialog tidak ikut disimpan).
 
 ### 3.13 `Pickup` (Anggota 3)
 
@@ -272,6 +277,9 @@ Dialog NPC dipilih sesuai progres lewat `rules` di `npcs.json`: `Game.pickDialog
 | W/S atau Panah atas/bawah (saat dialog, Crafting, atau panel) | Memilih jawaban, memilih resep, atau menggulir |
 | I / J / Q / C | Inventory / Journal / Quest Log / Crafting (tekan lagi untuk menutup) |
 | ESC | Pause. Saat dialog atau layar terbuka: menutupnya |
+| F5 / F9 | Simpan / Muat (saat bermain atau jeda). Di laptop mungkin perlu menahan Fn |
+| K / L / M (hanya di layar Pause) | Simpan / Muat / Kembali ke Main Menu |
+| W/S dan E (di Main Menu) | Memilih dan mengonfirmasi. ESC, I, J, Q, C, F5, dan F9 diabaikan di menu |
 
 ## 6. Kepemilikan File
 
@@ -287,23 +295,26 @@ Mengubah file milik anggota lain hanya setelah dikoordinasikan.
 
 ## 7. Rencana Format Save
 
-File `saves/save.json` di dalam folder sketch (masuk `.gitignore`), dibuat dengan `JSONObject`:
+File `saves/save.json` di dalam folder sketch (masuk `.gitignore`), dibuat dengan `JSONObject`. Daftar ditulis sebagai array (bukan objek berkunci dinamis) agar mudah dibaca ulang:
 
 ```json
 {
   "version": 1,
   "player": { "x": 104.0, "y": 88.0 },
-  "inventory": { "green_leaf": 2, "water": 1 },
+  "inventory": [ { "id": "green_leaf", "qty": 2 }, { "id": "water", "qty": 1 } ],
   "journal": ["plants_need_light", "plant_green_leaf"],
-  "quests": {
-    "forgotten_garden": { "status": "ACTIVE", "done": [true, false, false, false, false, false], "rewardGiven": false }
-  },
-  "npcTalked": { "npc_gardener": 3 },
+  "recipesUnlocked": ["herbal_tea"],
+  "quests": [
+    { "id": "forgotten_garden", "status": "ACTIVE",
+      "done": [true, false, false, false, false, false], "rewardGiven": false }
+  ],
+  "npcTalked": [ { "id": "npc_gardener", "count": 3 } ],
   "visitedZones": ["forest"],
-  "pickupsCollected": ["pickup_leaf_1"],
-  "recipesUnlocked": ["herbal_tea", "garden_tonic"]
+  "pickupsCollected": ["pickup_leaf_1"]
 }
 ```
+
+**Aturan muat:** file ditolak (dengan pesan jelas, tanpa mengubah game) bila JSON rusak, `version` bukan 1, ada bagian yang hilang, ada ID yang tidak dikenal oleh data game saat ini (item, entry, resep, quest, NPC, zona, benda), jumlah `done` tidak cocok dengan objective quest, atau posisi pemain di luar peta. Bila posisi jatuh di tile yang menghalangi, pemain dipindah ke titik awal peta. Karena itu **save lama bisa tidak cocok** setelah ID di file data diubah atau dihapus (hal normal selama pengembangan: hapus `saves/save.json`).
 
 ## 8. Skenario *The Forgotten Garden* (data contoh)
 
@@ -347,14 +358,18 @@ Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Se
 8. **Selesaikan:** bicara dengan penjaga taman. Dialog "Kamu membawa Herbal Tea!" tampil, quest selesai, dan muncul tiga notifikasi reward. Resep kedua (Garden Tonic) muncul di layar Crafting.
 9. **Reward tidak berulang:** bicara lagi dengan penjaga taman. Garden Seed tetap x1.
 10. Buka Journal: bila isinya panjang, W/S menggulir panel. ESC menutup dialog atau layar, atau menjeda permainan.
+0. **Main Menu:** saat game dibuka tampil menu. Tanpa data simpanan, pilihan awal adalah "Permainan Baru" dan "Lanjutkan" redup. Dengan data simpanan, pilihan awal adalah "Lanjutkan".
+11. **Simpan dan muat:** setelah menerima quest dan mengambil beberapa benda, tekan **F5** (notifikasi "Permainan disimpan."). Ambil benda lain, lalu tekan **F9**: inventory, Journal, quest, dan posisi kembali seperti saat F5, dan benda yang tadi diambil muncul lagi. Di layar Pause (ESC), **K** menyimpan dan **L** memuat. Folder `WhispersOfKnowledge/saves/` dibuat otomatis.
+12. **Muat di sesi baru:** tutup game, jalankan lagi, tekan F9 atau ESC lalu L. Progres harus kembali. Hapus `saves/save.json`, lalu F9: muncul pesan "Belum ada data simpanan."
 
 ## 10. Status Pengujian dan Batasan
 
-**Pengujian:** 105 pemeriksaan otomatis lulus dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
+**Pengujian:** 172 pemeriksaan otomatis lulus (105 untuk data dan alur, 43 untuk Save/Load, 24 untuk Main Menu) dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. Save/Load: simpan di tengah quest lalu muat, muat di game baru, reward tidak berulang, 11 jenis file simpanan rusak ditolak tanpa mengubah game, penulisan gagal, dan tombol F5/F9/K/L. Main Menu: navigasi berputar, Lanjutkan tanpa save, Permainan Baru mereset semua progres, kembali ke menu dari Pause lalu Lanjutkan, dan Keluar. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
 
 **Batasan yang diketahui:**
 
-- Belum ada Save/Load. Progres `visitedZones`, pickup yang sudah diambil, dan resep terbuka harus ikut disimpan saat `SaveManager` dibuat (lihat bagian 7).
+- Satu slot simpanan dan belum ada simpan otomatis. "Permainan Baru" tidak menghapus file simpanan lama (baru tertimpa saat Anda menyimpan lagi).
+- Dialog yang sedang terbuka tidak ikut disimpan (simpan/muat dinonaktifkan saat dialog).
 - Satu peta (`greenhaven.json`). Perpindahan antar peta belum ada.
 - Jenis trigger, perintah aksi, dan karakter tile baru masih perlu kode.
 - Tidak ada pesan "inventory penuh" karena jumlah slot tidak dibatasi.
