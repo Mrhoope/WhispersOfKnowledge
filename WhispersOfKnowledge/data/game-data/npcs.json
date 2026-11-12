@@ -1,0 +1,28 @@
+{
+  "npcs": [
+    {
+      "id": "npc_gardener",
+      "name": "Penjaga Taman",
+      "tileX": 12,
+      "tileY": 9,
+      "dialogue": "gardener_intro",
+      "rules": [
+        {
+          "quest": "forgotten_garden",
+          "state": "completed",
+          "dialogue": "gardener_done"
+        },
+        {
+          "quest": "forgotten_garden",
+          "state": "ready",
+          "dialogue": "gardener_ready"
+        },
+        {
+          "quest": "forgotten_garden",
+          "state": "active",
+          "dialogue": "gardener_reminder"
+        }
+      ]
+    }
+  ]
+}

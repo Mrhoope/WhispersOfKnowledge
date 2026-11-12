@@ -1,0 +1,53 @@
+{
+  "items": [
+    {
+      "id": "green_leaf",
+      "name": "Green Leaf",
+      "description": "Daun hijau segar. Bahan dasar ramuan herbal.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "sunpetal",
+      "name": "Sunpetal",
+      "description": "Bunga kuning yang mekar saat matahari terbit.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "moon_fern",
+      "name": "Moon Fern",
+      "description": "Pakis berembun yang tumbuh di tempat teduh.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "description": "Air bersih dari kolam.",
+      "category": "Materials",
+      "icon": ""
+    },
+    {
+      "id": "herbal_tea",
+      "name": "Herbal Tea",
+      "description": "Teh hangat dari daun herbal.",
+      "category": "Crafted Items",
+      "icon": ""
+    },
+    {
+      "id": "garden_tonic",
+      "name": "Garden Tonic",
+      "description": "Ramuan untuk menyuburkan tanaman.",
+      "category": "Crafted Items",
+      "icon": ""
+    },
+    {
+      "id": "garden_seed",
+      "name": "Garden Seed",
+      "description": "Biji hadiah dari penjaga taman.",
+      "category": "Quest Items",
+      "icon": ""
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "sets": [
+    {
+      "id": "gardener_intro",
+      "lines": [
+        {
+          "text": "Halo, pengembara! Taman ini dulu sangat indah.",
+          "next": 1
+        },
+        {
+          "text": "Sekarang taman ini terlupakan. Maukah kamu membantuku?",
+          "choices": [
+            {
+              "text": "Ya, aku akan membantu.",
+              "next": 2
+            },
+            {
+              "text": "Nanti dulu.",
+              "next": 5
+            }
+          ]
+        },
+        {
+          "text": "Terima kasih! Pergilah ke hutan di timur jalan dan temukan tiga jenis tanaman. Tekan E untuk mengambilnya.",
+          "next": 3,
+          "action": "start_quest:forgotten_garden;objective:forgotten_garden:0;discover:plants_need_light"
+        },
+        {
+          "text": "Kamu juga butuh air bersih dari kolam. Setelah bahan lengkap, buka Crafting dengan tombol C untuk membuat Herbal Tea.",
+          "next": 4
+        },
+        {
+          "text": "Bawa Herbal Tea itu kembali kepadaku, ya.",
+          "next": -1
+        },
+        {
+          "text": "Baiklah. Kembalilah kalau kamu sudah siap.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "gardener_reminder",
+      "lines": [
+        {
+          "text": "Hutan ada di timur jalan. Cari tiga jenis tanaman dan ambil air dari kolam.",
+          "next": 1
+        },
+        {
+          "text": "Lalu buat Herbal Tea dengan tombol C, dan kembalilah kepadaku.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "gardener_ready",
+      "lines": [
+        {
+          "text": "Kamu membawa Herbal Tea! Harumnya seperti taman di masa lalu.",
+          "next": 1
+        },
+        {
+          "text": "Taman ini akan hidup lagi. Terima kasih! Ini hadiah untukmu.",
+          "next": 2,
+          "action": "finish_quest:forgotten_garden"
+        },
+        {
+          "text": "Aku menambahkan catatan di Journal-mu dan sebuah resep baru: Garden Tonic.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "gardener_done",
+      "lines": [
+        {
+          "text": "Terima kasih sudah membantu. Tamannya kembali hijau!",
+          "next": 1
+        },
+        {
+          "text": "Coba buat Garden Tonic dengan tombol C untuk menyuburkan tanaman.",
+          "next": -1
+        }
+      ]
+    }
+  ]
+}

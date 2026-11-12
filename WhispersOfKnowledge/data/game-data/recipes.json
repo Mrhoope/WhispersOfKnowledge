@@ -1,0 +1,46 @@
+{
+  "recipes": [
+    {
+      "id": "herbal_tea",
+      "name": "Herbal Tea",
+      "unlocked": true,
+      "ingredients": [
+        {
+          "id": "green_leaf",
+          "qty": 2
+        },
+        {
+          "id": "water",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "id": "herbal_tea",
+        "qty": 1
+      }
+    },
+    {
+      "id": "garden_tonic",
+      "name": "Garden Tonic",
+      "unlocked": false,
+      "ingredients": [
+        {
+          "id": "sunpetal",
+          "qty": 1
+        },
+        {
+          "id": "moon_fern",
+          "qty": 1
+        },
+        {
+          "id": "water",
+          "qty": 1
+        }
+      ],
+      "output": {
+        "id": "garden_tonic",
+        "qty": 1
+      }
+    }
+  ]
+}

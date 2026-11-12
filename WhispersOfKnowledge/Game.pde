@@ -1,7 +1,8 @@
 // Game.pde
 // Pemilik semua sistem dan state permainan. (Anggota 1)
 // Game hanya MENGATUR alur dan menghubungkan sistem. Tampilan ada di UI,
-// kamera di Camera, dialog di DialogueSystem.
+// kamera di Camera, dialog di DialogueSystem, dan konten (item, quest, dialog,
+// peta) dimuat dari folder data/ oleh DataLoader.
 
 enum GameState {
   PLAYING, DIALOGUE, INVENTORY, JOURNAL, QUEST_LOG, CRAFTING, PAUSED
@@ -21,32 +22,22 @@ class Game {
   SaveManager saveManager;
   UI ui;
 
+  // isi data dari file
+  HashMap<String, DialogueLine[]> dialogueSets = new HashMap<String, DialogueLine[]>();
+  ArrayList<String> dataErrors = new ArrayList<String>();   // masalah saat memuat data
+
   GameState state = GameState.PLAYING;
 
   // tombol gerak yang sedang ditahan
   boolean keyUp, keyDown, keyLeft, keyRight;
 
   // progres yang tidak tersimpan di class lain
-  boolean forestVisited = false;
+  HashSet<String> visitedZones = new HashSet<String>();
   int craftSelected = 0;
-
-  // ID dan nomor objective quest utama
-  final String QUEST_ID = "forgotten_garden";
-  final String GARDENER_ID = "npc_gardener";
-  final int OBJ_TALK = 0;
-  final int OBJ_FOREST = 1;
-  final int OBJ_PLANTS = 2;
-  final int OBJ_GATHER = 3;
-  final int OBJ_CRAFT = 4;
-  final int OBJ_RETURN = 5;
-
-  // dialog penjaga taman sesuai progres quest
-  DialogueLine[] gardenerIntro, gardenerReminder, gardenerReady, gardenerDone;
 
   Game() {
     world = new World(40, 30);
     camera = new Camera(width / (float) ZOOM, height / (float) ZOOM);
-    player = new Player(5 * TILE_SIZE + 8, 5 * TILE_SIZE + 8);
     inventory = new Inventory();
     journal = new Journal();
     quests = new QuestManager();
@@ -54,121 +45,16 @@ class Game {
     dialogue = new DialogueSystem();
     saveManager = new SaveManager();
     ui = new UI();
-    setupContent();
-  }
 
-  // ---------- konten permainan ----------
-  // DATA CONTOH. Nanti dipindah ke data/game-data (JSON).
+    // memuat peta dan semua konten dari data/
+    DataLoader loader = new DataLoader();
+    loader.loadAll(this);
 
-  float tileCenter(int tile) {
-    return tile * TILE_SIZE + TILE_SIZE / 2;
-  }
+    player = new Player(world.getStartX(), world.getStartY());
 
-  void setupContent() {
-    // item
-    inventory.registerItem(new ItemData("green_leaf", "Green Leaf", "Daun hijau segar. Bahan dasar ramuan herbal.", "Plants", ""));
-    inventory.registerItem(new ItemData("sunpetal", "Sunpetal", "Bunga kuning yang mekar saat matahari terbit.", "Plants", ""));
-    inventory.registerItem(new ItemData("moon_fern", "Moon Fern", "Pakis berembun yang tumbuh di tempat teduh.", "Plants", ""));
-    inventory.registerItem(new ItemData("water", "Water", "Air bersih dari kolam.", "Materials", ""));
-    inventory.registerItem(new ItemData("herbal_tea", "Herbal Tea", "Teh hangat dari daun herbal.", "Crafted Items", ""));
-    inventory.registerItem(new ItemData("garden_tonic", "Garden Tonic", "Ramuan untuk menyuburkan tanaman.", "Crafted Items", ""));
-    inventory.registerItem(new ItemData("garden_seed", "Garden Seed", "Biji hadiah dari penjaga taman.", "Quest Items", ""));
-
-    // resep
-    crafting.addRecipe(new Recipe("herbal_tea", "Herbal Tea",
-      new String[] {"green_leaf", "water"}, new int[] {2, 1}, "herbal_tea", 1));
-    Recipe tonic = new Recipe("garden_tonic", "Garden Tonic",
-      new String[] {"sunpetal", "moon_fern", "water"}, new int[] {1, 1, 1}, "garden_tonic", 1);
-    tonic.unlocked = false;   // dibuka sebagai reward quest
-    crafting.addRecipe(tonic);
-
-    // journal
-    journal.registerEntry(new JournalEntry("plants_need_light", "Tanaman Butuh Cahaya", "Biology",
-      "Tumbuhan membuat makanannya sendiri dengan bantuan cahaya matahari.",
-      "Proses ini disebut fotosintesis."));
-    journal.registerEntry(new JournalEntry("plant_green_leaf", "Daun Hijau", "Biology",
-      "Daun berwarna hijau karena mengandung klorofil.",
-      "Klorofil menangkap cahaya matahari untuk fotosintesis."));
-    journal.registerEntry(new JournalEntry("plant_sunpetal", "Bunga Sunpetal", "Biology",
-      "Bunga kuning ini mekar saat pagi dan didatangi lebah.",
-      "Serangga membantu penyerbukan, yaitu memindahkan serbuk sari agar tumbuhan dapat berbiak."));
-    journal.registerEntry(new JournalEntry("plant_moon_fern", "Pakis Moon Fern", "Biology",
-      "Pakis tumbuh di tempat teduh dan lembap.",
-      "Pakis berkembang biak dengan spora, bukan dengan biji."));
-    journal.registerEntry(new JournalEntry("water_source", "Air Kolam", "Science",
-      "Air kolam bening dan bisa disaring untuk ramuan.",
-      "Air dapat berwujud cair, padat (es), dan gas (uap), tergantung suhunya."));
-    journal.registerEntry(new JournalEntry("herbal_tea_recipe", "Resep Herbal Tea", "Alchemy",
-      "2 Green Leaf dan 1 Water menghasilkan 1 Herbal Tea.",
-      "Resep menetapkan bahan dan takaran. Takaran yang kurang membuat ramuan gagal dibuat."));
-    journal.registerEntry(new JournalEntry("garden_ecosystem", "Taman sebagai Ekosistem", "Biology",
-      "Tanaman, serangga, jamur, dan air di taman saling membutuhkan.",
-      "Ekosistem adalah hubungan saling bergantung antara makhluk hidup dan lingkungannya."));
-
-    // quest utama (objective sesuai PRD 8.3)
-    Quest q = new Quest(QUEST_ID, "The Forgotten Garden",
-      "Bantu penjaga taman menghidupkan kembali tamannya.",
-      new String[] {
-        "Berbicara dengan penjaga taman",
-        "Menjelajahi Whispering Forest (timur jalan)",
-        "Menemukan tiga jenis tanaman",
-        "Mengumpulkan bahan: 2 Green Leaf dan 1 Water",
-        "Membuat Herbal Tea (tombol C)",
-        "Kembali kepada penjaga taman"
-      });
-    q.status = QuestStatus.AVAILABLE;
-    quests.addQuest(q);
-
-    // benda yang bisa diambil: dua Green Leaf, Sunpetal, Moon Fern di hutan, dan air di kolam
-    pickups.add(new Pickup("pickup_leaf_1", "Green Leaf", "green_leaf", 1,
-      tileCenter(22), tileCenter(6), false, "plant_green_leaf", 70, 170, 70));
-    pickups.add(new Pickup("pickup_leaf_2", "Green Leaf", "green_leaf", 1,
-      tileCenter(24), tileCenter(10), false, "plant_green_leaf", 70, 170, 70));
-    pickups.add(new Pickup("pickup_sunpetal", "Sunpetal", "sunpetal", 1,
-      tileCenter(30), tileCenter(8), false, "plant_sunpetal", 250, 210, 60));
-    pickups.add(new Pickup("pickup_moon_fern", "Moon Fern", "moon_fern", 1,
-      tileCenter(34), tileCenter(12), false, "plant_moon_fern", 120, 200, 190));
-    pickups.add(new Pickup("pickup_water", "Air Kolam", "water", 1,
-      tileCenter(24), tileCenter(20), true, "water_source", 80, 150, 230));
-
-    setupGardenerDialogues();
-    npcs.add(new NPC(GARDENER_ID, "Penjaga Taman",
-      tileCenter(12), tileCenter(9), gardenerIntro));
-  }
-
-  void setupGardenerDialogues() {
-    // Sebelum quest diterima
-    gardenerIntro = new DialogueLine[] {
-      /* 0 */ new DialogueLine("Halo, pengembara! Taman ini dulu sangat indah.", 1, ""),
-      /* 1 */ new DialogueLine("Sekarang taman ini terlupakan. Maukah kamu membantuku?",
-                new String[] {"Ya, aku akan membantu.", "Nanti dulu."},
-                new int[] {2, 5}),
-      /* 2 */ new DialogueLine("Terima kasih! Pergilah ke hutan di timur jalan dan temukan tiga jenis tanaman. Tekan E untuk mengambilnya.", 3,
-                "start_quest:" + QUEST_ID + ";objective:" + QUEST_ID + ":" + OBJ_TALK + ";discover:plants_need_light"),
-      /* 3 */ new DialogueLine("Kamu juga butuh air bersih dari kolam. Setelah bahan lengkap, buka Crafting dengan tombol C untuk membuat Herbal Tea.", 4, ""),
-      /* 4 */ new DialogueLine("Bawa Herbal Tea itu kembali kepadaku, ya.", -1, ""),
-      /* 5 */ new DialogueLine("Baiklah. Kembalilah kalau kamu sudah siap.", -1, "")
-    };
-
-    // Quest aktif, tujuan belum selesai
-    gardenerReminder = new DialogueLine[] {
-      /* 0 */ new DialogueLine("Hutan ada di timur jalan. Cari tiga jenis tanaman dan ambil air dari kolam.", 1, ""),
-      /* 1 */ new DialogueLine("Lalu buat Herbal Tea dengan tombol C, dan kembalilah kepadaku.", -1, "")
-    };
-
-    // Semua tujuan selesai, tinggal kembali
-    gardenerReady = new DialogueLine[] {
-      /* 0 */ new DialogueLine("Kamu membawa Herbal Tea! Harumnya seperti taman di masa lalu.", 1, ""),
-      /* 1 */ new DialogueLine("Taman ini akan hidup lagi. Terima kasih! Ini hadiah untukmu.", 2,
-                "finish_quest:" + QUEST_ID),
-      /* 2 */ new DialogueLine("Aku menambahkan catatan di Journal-mu dan sebuah resep baru: Garden Tonic.", -1, "")
-    };
-
-    // Quest selesai
-    gardenerDone = new DialogueLine[] {
-      /* 0 */ new DialogueLine("Terima kasih sudah membantu. Tamannya kembali hijau!", 1, ""),
-      /* 1 */ new DialogueLine("Coba buat Garden Tonic dengan tombol C untuk menyuburkan tanaman.", -1, "")
-    };
+    if (!dataErrors.isEmpty()) {
+      ui.showNotification("Ada " + dataErrors.size() + " masalah data. Lihat kotak merah.");
+    }
   }
 
   // ---------- update dan render ----------
@@ -184,10 +70,17 @@ class Game {
     if (keyDown)  dy += 1;
     player.update(world, dx, dy);
 
-    if (!forestVisited && world.isForestPx(player.getX(), player.getY())) {
-      forestVisited = true;
-      ui.showNotification("Kamu memasuki Whispering Forest");
-      checkQuestProgress();
+    checkZoneEntry();
+  }
+
+  // Mencatat zona yang pertama kali dimasuki pemain.
+  void checkZoneEntry() {
+    for (Zone z : world.getZones()) {
+      if (!visitedZones.contains(z.id) && world.isInZonePx(z.id, player.getX(), player.getY())) {
+        visitedZones.add(z.id);
+        ui.showNotification("Kamu memasuki " + z.name);
+        checkQuestProgress();
+      }
     }
   }
 
@@ -222,6 +115,7 @@ class Game {
       default: break;
     }
     ui.renderNotification();
+    ui.renderDataErrors(dataErrors);
   }
 
   // ---------- interaksi ----------
@@ -294,9 +188,7 @@ class Game {
   }
 
   void talkTo(NPC n) {
-    if (n.getId().equals(GARDENER_ID)) {
-      n.setDialogue(pickGardenerDialogue());
-    }
+    n.setDialogue(pickDialogueFor(n));
     n.interact(dialogue);
     if (dialogue.isOpen()) {
       state = GameState.DIALOGUE;
@@ -304,23 +196,25 @@ class Game {
     afterDialogueInput();
   }
 
-  // Memilih dialog penjaga taman sesuai status quest.
-  DialogueLine[] pickGardenerDialogue() {
-    Quest q = quests.getQuest(QUEST_ID);
-    if (q == null) return gardenerIntro;
-    if (q.status == QuestStatus.COMPLETED) return gardenerDone;
-    if (q.status == QuestStatus.ACTIVE) {
-      return readyToReturn(q) ? gardenerReady : gardenerReminder;
+  // Memilih dialog NPC: aturan pertama yang cocok dengan status quest, atau dialog bawaan.
+  DialogueLine[] pickDialogueFor(NPC n) {
+    for (DialogueRule r : n.getRules()) {
+      Quest q = quests.getQuest(r.questId);
+      if (q != null && stateMatches(q, r.state)) {
+        DialogueLine[] set = dialogueSets.get(r.dialogueId);
+        if (set != null) return set;
+      }
     }
-    return gardenerIntro;
+    return n.getDefaultDialogue();
   }
 
-  // true jika semua objective selesai kecuali yang terakhir (kembali ke NPC).
-  boolean readyToReturn(Quest q) {
-    for (int i = 0; i < q.done.length - 1; i++) {
-      if (!q.done[i]) return false;
-    }
-    return true;
+  boolean stateMatches(Quest q, String state) {
+    if (state.equals("locked"))    return q.status == QuestStatus.LOCKED;
+    if (state.equals("available")) return q.status == QuestStatus.AVAILABLE;
+    if (state.equals("active"))    return q.status == QuestStatus.ACTIVE;
+    if (state.equals("ready"))     return q.status == QuestStatus.ACTIVE && q.readyToReturn();
+    if (state.equals("completed")) return q.status == QuestStatus.COMPLETED;
+    return false;
   }
 
   void collect(Pickup p) {
@@ -355,29 +249,49 @@ class Game {
   }
 
   void afterCraft(String recipeId) {
-    if (recipeId.equals("herbal_tea") && journal.discover("herbal_tea_recipe")) {
-      ui.showNotification("Journal diperbarui: Resep Herbal Tea");
+    // Mencatat resep yang sudah pernah dibuat ke Journal: entry bernama "<id resep>_recipe".
+    String entryId = recipeId + "_recipe";
+    if (journal.discover(entryId)) {
+      ui.showNotification("Journal diperbarui: " + journal.getEntry(entryId).title);
     }
     checkQuestProgress();
   }
 
   // ---------- quest ----------
 
-  // Memeriksa kondisi semua objective quest utama dan menandai yang terpenuhi.
+  // true jika syarat otomatis sebuah objective sudah terpenuhi.
+  boolean isTriggerMet(Trigger t) {
+    if (t == null || t.type.equals("manual")) return false;
+
+    if (t.type.equals("enter_zone")) {
+      return visitedZones.contains(t.zoneId);
+    }
+    if (t.type.equals("discover")) {
+      for (String id : t.discoverIds) {
+        if (!journal.hasEntry(id)) return false;
+      }
+      return true;
+    }
+    if (t.type.equals("have_items")) {
+      if (t.orDiscover.length() > 0 && journal.hasEntry(t.orDiscover)) return true;
+      for (int i = 0; i < t.itemIds.length; i++) {
+        if (!inventory.hasItem(t.itemIds[i], t.itemQty[i])) return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  // Memeriksa syarat semua objective dari semua quest aktif dan menandai yang terpenuhi.
   void checkQuestProgress() {
-    Quest q = quests.getQuest(QUEST_ID);
-    if (q == null || q.status != QuestStatus.ACTIVE) return;
-
-    boolean crafted = journal.hasEntry("herbal_tea_recipe");
-    boolean threePlants = journal.hasEntry("plant_green_leaf")
-                       && journal.hasEntry("plant_sunpetal")
-                       && journal.hasEntry("plant_moon_fern");
-    boolean materials = inventory.hasItem("green_leaf", 2) && inventory.hasItem("water", 1);
-
-    if (forestVisited) markObjective(q, OBJ_FOREST);
-    if (threePlants)   markObjective(q, OBJ_PLANTS);
-    if (materials || crafted) markObjective(q, OBJ_GATHER);
-    if (crafted)       markObjective(q, OBJ_CRAFT);
+    for (Quest q : quests.getAllQuests()) {
+      if (q.status != QuestStatus.ACTIVE) continue;
+      for (int i = 0; i < q.triggers.length; i++) {
+        if (isTriggerMet(q.triggers[i])) {
+          markObjective(q, i);
+        }
+      }
+    }
   }
 
   void markObjective(Quest q, int index) {
@@ -395,20 +309,26 @@ class Game {
     if (quests.completeQuest(id)) {
       ui.showNotification("Quest selesai: " + q.title);
       if (quests.claimReward(id)) {
-        giveQuestRewards(id);
+        giveQuestRewards(q);
       }
     }
   }
 
-  void giveQuestRewards(String id) {
-    if (id.equals(QUEST_ID)) {
-      inventory.addItem("garden_seed", 1);
-      ui.showNotification("Hadiah: Garden Seed x1");
-      if (crafting.unlockRecipe("garden_tonic")) {
-        ui.showNotification("Resep baru: Garden Tonic");
+  void giveQuestRewards(Quest q) {
+    QuestReward r = q.reward;
+    for (int i = 0; i < r.itemIds.length; i++) {
+      if (inventory.addItem(r.itemIds[i], r.itemQty[i])) {
+        ui.showNotification("Hadiah: " + itemName(r.itemIds[i]) + " x" + r.itemQty[i]);
       }
-      if (journal.discover("garden_ecosystem")) {
-        ui.showNotification("Journal diperbarui: Taman sebagai Ekosistem");
+    }
+    for (String id : r.recipeIds) {
+      if (crafting.unlockRecipe(id)) {
+        ui.showNotification("Resep baru: " + crafting.getRecipe(id).name);
+      }
+    }
+    for (String id : r.journalIds) {
+      if (journal.discover(id)) {
+        ui.showNotification("Journal diperbarui: " + journal.getEntry(id).title);
       }
     }
   }

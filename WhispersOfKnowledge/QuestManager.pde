@@ -6,6 +6,29 @@ enum QuestStatus {
   LOCKED, AVAILABLE, ACTIVE, COMPLETED
 }
 
+// Syarat otomatis sebuah objective. Diperiksa oleh Game.checkQuestProgress().
+//   "manual"     : tidak otomatis (diselesaikan lewat aksi dialog)
+//   "enter_zone" : pemain pernah masuk zona (zoneId)
+//   "discover"   : semua entry Journal di discoverIds sudah ditemukan
+//   "have_items" : inventory punya semua itemIds sebanyak itemQty
+//                  (atau entry orDiscover sudah ditemukan, bila diisi)
+class Trigger {
+  String type = "manual";
+  String zoneId = "";
+  String[] discoverIds = new String[0];
+  String[] itemIds = new String[0];
+  int[] itemQty = new int[0];
+  String orDiscover = "";
+}
+
+// Hadiah quest. Diberikan satu kali lewat QuestManager.claimReward().
+class QuestReward {
+  String[] itemIds = new String[0];
+  int[] itemQty = new int[0];
+  String[] recipeIds = new String[0];
+  String[] journalIds = new String[0];
+}
+
 class Quest {
   String id;
   String title;
@@ -13,6 +36,8 @@ class Quest {
   QuestStatus status = QuestStatus.LOCKED;
   String[] objectives;
   boolean[] done;
+  Trigger[] triggers;                       // satu per objective, null = manual
+  QuestReward reward = new QuestReward();
   boolean rewardGiven = false;
 
   Quest(String id, String title, String description, String[] objectives) {
@@ -21,10 +46,19 @@ class Quest {
     this.description = description;
     this.objectives = objectives;
     this.done = new boolean[objectives.length];
+    this.triggers = new Trigger[objectives.length];
   }
 
   boolean allObjectivesDone() {
     for (int i = 0; i < done.length; i++) {
+      if (!done[i]) return false;
+    }
+    return true;
+  }
+
+  // true jika semua objective selesai kecuali yang terakhir (kembali ke NPC).
+  boolean readyToReturn() {
+    for (int i = 0; i < done.length - 1; i++) {
       if (!done[i]) return false;
     }
     return true;

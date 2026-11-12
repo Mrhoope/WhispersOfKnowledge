@@ -1,0 +1,79 @@
+{
+  "pickups": [
+    {
+      "id": "pickup_leaf_1",
+      "name": "Green Leaf",
+      "item": "green_leaf",
+      "qty": 1,
+      "tileX": 22,
+      "tileY": 6,
+      "repeatable": false,
+      "journal": "plant_green_leaf",
+      "color": [
+        70,
+        170,
+        70
+      ]
+    },
+    {
+      "id": "pickup_leaf_2",
+      "name": "Green Leaf",
+      "item": "green_leaf",
+      "qty": 1,
+      "tileX": 24,
+      "tileY": 10,
+      "repeatable": false,
+      "journal": "plant_green_leaf",
+      "color": [
+        70,
+        170,
+        70
+      ]
+    },
+    {
+      "id": "pickup_sunpetal",
+      "name": "Sunpetal",
+      "item": "sunpetal",
+      "qty": 1,
+      "tileX": 30,
+      "tileY": 8,
+      "repeatable": false,
+      "journal": "plant_sunpetal",
+      "color": [
+        250,
+        210,
+        60
+      ]
+    },
+    {
+      "id": "pickup_moon_fern",
+      "name": "Moon Fern",
+      "item": "moon_fern",
+      "qty": 1,
+      "tileX": 34,
+      "tileY": 12,
+      "repeatable": false,
+      "journal": "plant_moon_fern",
+      "color": [
+        120,
+        200,
+        190
+      ]
+    },
+    {
+      "id": "pickup_water",
+      "name": "Air Kolam",
+      "item": "water",
+      "qty": 1,
+      "tileX": 24,
+      "tileY": 20,
+      "repeatable": true,
+      "journal": "water_source",
+      "color": [
+        80,
+        150,
+        230
+      ]
+    }
+  ]
+}

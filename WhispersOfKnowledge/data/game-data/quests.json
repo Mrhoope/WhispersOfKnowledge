@@ -1,0 +1,76 @@
+{
+  "quests": [
+    {
+      "id": "forgotten_garden",
+      "title": "The Forgotten Garden",
+      "description": "Bantu penjaga taman menghidupkan kembali tamannya.",
+      "status": "AVAILABLE",
+      "objectives": [
+        {
+          "text": "Berbicara dengan penjaga taman"
+        },
+        {
+          "text": "Menjelajahi Whispering Forest (timur jalan)",
+          "trigger": {
+            "type": "enter_zone",
+            "zone": "forest"
+          }
+        },
+        {
+          "text": "Menemukan tiga jenis tanaman",
+          "trigger": {
+            "type": "discover",
+            "ids": [
+              "plant_green_leaf",
+              "plant_sunpetal",
+              "plant_moon_fern"
+            ]
+          }
+        },
+        {
+          "text": "Mengumpulkan bahan: 2 Green Leaf dan 1 Water",
+          "trigger": {
+            "type": "have_items",
+            "items": [
+              {
+                "id": "green_leaf",
+                "qty": 2
+              },
+              {
+                "id": "water",
+                "qty": 1
+              }
+            ],
+            "orDiscover": "herbal_tea_recipe"
+          }
+        },
+        {
+          "text": "Membuat Herbal Tea (tombol C)",
+          "trigger": {
+            "type": "discover",
+            "ids": [
+              "herbal_tea_recipe"
+            ]
+          }
+        },
+        {
+          "text": "Kembali kepada penjaga taman"
+        }
+      ],
+      "rewards": {
+        "items": [
+          {
+            "id": "garden_seed",
+            "qty": 1
+          }
+        ],
+        "recipes": [
+          "garden_tonic"
+        ],
+        "journal": [
+          "garden_ecosystem"
+        ]
+      }
+    }
+  ]
+}
