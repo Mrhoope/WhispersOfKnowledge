@@ -5,7 +5,7 @@ Game edukasi **2D top-down pixel art adventure RPG** yang dibuat dengan **Proces
 Pemain menjelajahi dunia fantasi (desa, hutan, taman alkimia, perpustakaan), berbicara dengan NPC, menyelesaikan quest, dan melakukan crafting. Pembelajaran terjadi lewat aktivitas bermain, bukan sekadar tanya-jawab.
 
 > **Status:** Fase 2 terverifikasi. Skenario *The Forgotten Garden* dapat dimainkan dengan visual placeholder
-> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.5
+> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.7
 
 ## Fitur MVP
 
@@ -55,7 +55,8 @@ Fitur di luar MVP (combat, multiplayer, dll.) ada di PRD bagian 20.
 | Q | Quest Log |
 | C | Crafting |
 | W/S saat dialog, Crafting, atau panel | Memilih jawaban, memilih resep, atau menggulir |
-| ESC | Pause |
+| ESC | Pause (di sini: K simpan, L muat, M menu utama) |
+| F5 / F9 | Simpan / Muat permainan |
 
 ## Struktur Proyek
 

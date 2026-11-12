@@ -1,7 +1,7 @@
 AI PROJECT INSTRUCTIONS
 
 Project: Whispers of Knowledge
-Version: 1.3 (aligned with PRD v1.5)
+Version: 1.5 (aligned with PRD v1.7)
 
 1. PROJECT IDENTITY
 
@@ -88,6 +88,7 @@ Processing-specific:
 - Do not name methods after java.lang.Object methods (notify, wait, equals, hashCode, toString) unless truly overriding them.
 - Data files use JSON through Processing's built-in JSONObject and JSONArray. No extra library.
 - Game CONTENT (items, recipes, journal entries, quests, dialogues, NPCs, pickups, map) lives in JSON files under data/game-data/ and data/maps/, loaded by DataLoader. Never hard-code content in .pde files. Format: docs/DATA_FORMAT.md.
+- Anything that changes progress (new quest state, collected pickups, unlocked recipes, discovered entries, visited zones, NPC state) must also be written in SaveManager.saveGame and restored in loadGame/apply, and covered by a test. loadGame must validate the whole file first and leave the game unchanged on any problem.
 - A bad data file must never crash the game. DataLoader reports a clear message (console prefix [DATA] and the red box on screen) and the game keeps running. Keep that behavior when adding new data types, and add a validation rule for every new cross-reference.
 - New quest trigger types or dialogue action commands need code. Add them in Game.isTriggerMet / Game.runAction, validate them in DataLoader, and document them in DATA_FORMAT.md and TECHNICAL_SPEC.md.
 
@@ -163,7 +164,7 @@ Rules:
 
 - Do not jump to later phases without checking whether earlier requirements work.
 - If asked for something from a later phase, say so first, then continue only if the team confirms.
-- Basic UI (HUD, dialogue box, Inventory, Journal, Quest Log, Pause) appears together with the feature that needs it. Phase 6 polishes it and adds Main Menu and Crafting Interface.
+- Basic UI (HUD, dialogue box, Inventory, Journal, Quest Log, Pause) appears together with the feature that needs it. A basic Main Menu exists. Phase 6 polishes the UI once art assets are ready.
 
 12. DEFINITION OF DONE
 

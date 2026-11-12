@@ -5,7 +5,7 @@
 // peta) dimuat dari folder data/ oleh DataLoader.
 
 enum GameState {
-  PLAYING, DIALOGUE, INVENTORY, JOURNAL, QUEST_LOG, CRAFTING, PAUSED
+  MENU, PLAYING, DIALOGUE, INVENTORY, JOURNAL, QUEST_LOG, CRAFTING, PAUSED
 }
 
 class Game {
@@ -26,7 +26,8 @@ class Game {
   HashMap<String, DialogueLine[]> dialogueSets = new HashMap<String, DialogueLine[]>();
   ArrayList<String> dataErrors = new ArrayList<String>();   // masalah saat memuat data
 
-  GameState state = GameState.PLAYING;
+  GameState state = GameState.MENU;
+  int menuSelected = 0;   // pilihan di Main Menu
 
   // tombol gerak yang sedang ditahan
   boolean keyUp, keyDown, keyLeft, keyRight;
@@ -36,6 +37,23 @@ class Game {
   int craftSelected = 0;
 
   Game() {
+    init();
+  }
+
+  // Membuat semua sistem dari awal dan memuat data. Dipakai saat game dibuka
+  // dan saat "Permainan Baru", sehingga tidak ada sisa progres lama.
+  void init() {
+    npcs = new ArrayList<NPC>();
+    pickups = new ArrayList<Pickup>();
+    dialogueSets = new HashMap<String, DialogueLine[]>();
+    dataErrors = new ArrayList<String>();
+    visitedZones = new HashSet<String>();
+    craftSelected = 0;
+    keyUp = false;
+    keyDown = false;
+    keyLeft = false;
+    keyRight = false;
+
     world = new World(40, 30);
     camera = new Camera(width / (float) ZOOM, height / (float) ZOOM);
     inventory = new Inventory();
@@ -51,6 +69,9 @@ class Game {
     loader.loadAll(this);
 
     player = new Player(world.getStartX(), world.getStartY());
+
+    state = GameState.MENU;
+    menuSelected = saveManager.hasSave() ? 0 : 1;   // Lanjutkan bila ada simpanan
 
     if (!dataErrors.isEmpty()) {
       ui.showNotification("Ada " + dataErrors.size() + " masalah data. Lihat kotak merah.");
@@ -87,6 +108,13 @@ class Game {
   void render() {
     background(20, 28, 22);
 
+    if (state == GameState.MENU) {
+      ui.renderMenu(menuSelected, saveManager.hasSave());
+      ui.renderNotification();
+      ui.renderDataErrors(dataErrors);
+      return;
+    }
+
     camera.follow(player.getX(), player.getY(), world);
 
     // dunia (dengan kamera dan zoom)
@@ -111,7 +139,7 @@ class Game {
       case JOURNAL:   ui.renderJournal(journal); break;
       case QUEST_LOG: ui.renderQuestLog(quests); break;
       case CRAFTING:  ui.renderCrafting(crafting, inventory, craftSelected); break;
-      case PAUSED:    ui.renderPause(); break;
+      case PAUSED:    ui.renderPause(saveManager.hasSave()); break;
       default: break;
     }
     ui.renderNotification();
@@ -170,7 +198,35 @@ class Game {
     return null;
   }
 
+  // ---------- Main Menu ----------
+
+  void startNewGame() {
+    init();
+    state = GameState.PLAYING;
+  }
+
+  void menuConfirm() {
+    if (menuSelected == 0) {
+      saveManager.loadGame(this);   // berhasil: state menjadi PLAYING; gagal: tetap di menu
+      ui.showNotification(saveManager.getLastMessage());
+    } else if (menuSelected == 1) {
+      startNewGame();
+    } else {
+      exit();
+    }
+  }
+
+  // Kembali ke Main Menu dari layar Pause (progres yang belum disimpan hilang).
+  void backToMenu() {
+    if (state != GameState.PAUSED) return;
+    init();
+  }
+
   void onInteract() {
+    if (state == GameState.MENU) {
+      menuConfirm();
+      return;
+    }
     if (state == GameState.DIALOGUE) {
       dialogue.confirm();
       afterDialogueInput();
@@ -401,7 +457,25 @@ class Game {
     craftSelected = 0;
   }
 
+  // Simpan dan muat hanya saat bermain atau jeda (dialog tidak ikut disimpan).
+  boolean canSaveLoad() {
+    return state == GameState.PLAYING || state == GameState.PAUSED;
+  }
+
+  void quickSave() {
+    if (!canSaveLoad()) return;
+    saveManager.saveGame(this);
+    ui.showNotification(saveManager.getLastMessage());
+  }
+
+  void quickLoad() {
+    if (!canSaveLoad()) return;
+    saveManager.loadGame(this);
+    ui.showNotification(saveManager.getLastMessage());
+  }
+
   void onEscape() {
+    if (state == GameState.MENU) return;
     if (state == GameState.DIALOGUE) {
       dialogue.close();
       state = GameState.PLAYING;
@@ -414,7 +488,9 @@ class Game {
 
   // delta = -1 (naik) atau 1 (turun): pilihan dialog, resep, atau gulir panel
   void onMenuMove(int delta) {
-    if (state == GameState.DIALOGUE) {
+    if (state == GameState.MENU) {
+      menuSelected = (menuSelected + delta + 3) % 3;
+    } else if (state == GameState.DIALOGUE) {
       dialogue.moveSelection(delta);
     } else if (state == GameState.CRAFTING) {
       int n = crafting.getUnlockedRecipes().size();
@@ -433,6 +509,8 @@ class Game {
       if (keyCode == DOWN)  { keyDown = true; onMenuMove(1); }
       if (keyCode == LEFT)  keyLeft = true;
       if (keyCode == RIGHT) keyRight = true;
+      if (keyCode == 116) quickSave();   // F5
+      if (keyCode == 120) quickLoad();   // F9
       return;
     }
 
@@ -451,6 +529,11 @@ class Game {
     if (k == 'j') toggleScreen(GameState.JOURNAL);
     if (k == 'q') toggleScreen(GameState.QUEST_LOG);
     if (k == 'c') toggleScreen(GameState.CRAFTING);
+    if (state == GameState.PAUSED) {
+      if (k == 'k') quickSave();
+      if (k == 'l') quickLoad();
+      if (k == 'm') backToMenu();
+    }
   }
 
   void keyReleased() {

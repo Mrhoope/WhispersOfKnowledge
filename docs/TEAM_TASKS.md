@@ -25,7 +25,8 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 3 | `Game`: state permainan dan `runAction()` yang menghubungkan dialog dengan quest, item, journal |
 | 4 | `QuestManager` (status, objective, `claimReward`) |
 | 5 | `DataLoader` (memuat dan memvalidasi JSON) dan `Game` yang tidak lagi memuat konten di kode |
-| 6 | `SaveManager` (saveGame, loadGame, getLastMessage) dan integrasi seluruh sistem |
+| 6 | `SaveManager` (saveGame, loadGame, hasSave, getLastMessage): selesai, satu slot, F5/F9 |
+| 6 | Main Menu dasar (selesai). Integrasi seluruh sistem dan bug fixing |
 | 7 | Bug fixing, build final |
 
 ## Anggota 2: Player & World Programmer
@@ -50,7 +51,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 4 | `CraftingSystem` (cek bahan sebelum mengurangi item, resep terkunci) dan layar Crafting (tombol C) di `UI` |
 | 4 | `Journal` (registerEntry, discover, addEntry, hasEntry) |
 | 5 | Mengisi konten MVP lewat JSON: 3 NPC, side quest, item, dan entry Journal (`data/game-data/`, panduan di `docs/DATA_FORMAT.md`) |
-| 6 | Menyempurnakan `UI` dan menambah Main Menu dan Crafting Interface (HUD, Inventory, Journal, Quest Log, Pause, Notification dasar sudah ada) |
+| 6 | Menyempurnakan tampilan `UI` setelah aset jadi (HUD, Inventory, Journal, Quest Log, Pause, Crafting, Main Menu dasar sudah ada) |
 
 ## Anggota 4: AI Asset & World Designer
 
