@@ -7,6 +7,8 @@ class Player {
   float speed = 1.2;     // pixel dunia per frame
   int facing = 0;        // 0 bawah, 1 atas, 2 kiri, 3 kanan
   boolean moving = false;
+  PImage[] sprites = new PImage[4];   // per arah hadap (0 bawah, 1 atas, 2 kiri, 3 kanan)
+  PImage spriteAny = null;            // cadangan bila arah tertentu tidak punya gambar
 
   // kotak collision di sekitar kaki
   final float HALF_W = 5;
@@ -43,8 +45,22 @@ class Player {
         || world.isBlockedPx(nx + HALF_W, ny);
   }
 
-  // Placeholder: kotak biru. Diganti sprite AI di Fase 5.
+  // Mengatur gambar untuk satu arah hadap. img boleh null.
+  void setSprite(int facingDir, PImage img) {
+    if (facingDir >= 0 && facingDir < 4) sprites[facingDir] = img;
+  }
+
+  void setFallbackSprite(PImage img) {
+    spriteAny = img;
+  }
+
+  // Memakai sprite bila ada, kalau tidak ada: placeholder kotak biru.
   void render() {
+    PImage img = (sprites[facing] != null) ? sprites[facing] : spriteAny;
+    if (img != null) {
+      image(img, x - img.width / 2.0, y - img.height);
+      return;
+    }
     noStroke();
     fill(40, 40, 40, 90);
     ellipse(x, y, 12, 5);         // bayangan

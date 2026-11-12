@@ -23,6 +23,54 @@
           "dialogue": "gardener_reminder"
         }
       ]
+    },
+    {
+      "id": "npc_merchant",
+      "name": "Pedagang Pasar",
+      "tileX": 16,
+      "tileY": 13,
+      "dialogue": "merchant_intro",
+      "rules": [
+        {
+          "quest": "side_market",
+          "state": "completed",
+          "dialogue": "merchant_done"
+        },
+        {
+          "quest": "side_market",
+          "state": "ready",
+          "dialogue": "merchant_ready"
+        },
+        {
+          "quest": "side_market",
+          "state": "active",
+          "dialogue": "merchant_wait"
+        }
+      ]
+    },
+    {
+      "id": "npc_ranger",
+      "name": "Penjaga Hutan",
+      "tileX": 21,
+      "tileY": 12,
+      "dialogue": "ranger_intro",
+      "rules": [
+        {
+          "quest": "side_forest",
+          "state": "completed",
+          "dialogue": "ranger_done"
+        },
+        {
+          "quest": "side_forest",
+          "state": "ready",
+          "dialogue": "ranger_ready"
+        },
+        {
+          "quest": "side_forest",
+          "state": "active",
+          "dialogue": "ranger_wait"
+        }
+      ]
     }
   ]
 }

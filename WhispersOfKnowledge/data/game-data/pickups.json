@@ -74,6 +74,81 @@
         150,
         230
       ]
+    },
+    {
+      "id": "pickup_berry_1",
+      "name": "Semak Beri",
+      "item": "wild_berry",
+      "qty": 2,
+      "tileX": 8,
+      "tileY": 18,
+      "repeatable": false,
+      "journal": "berry_fruit",
+      "color": [
+        200,
+        40,
+        90
+      ]
+    },
+    {
+      "id": "pickup_berry_2",
+      "name": "Semak Beri",
+      "item": "wild_berry",
+      "qty": 2,
+      "tileX": 14,
+      "tileY": 22,
+      "repeatable": false,
+      "journal": "berry_fruit",
+      "color": [
+        200,
+        40,
+        90
+      ]
+    },
+    {
+      "id": "pickup_berry_3",
+      "name": "Semak Beri",
+      "item": "wild_berry",
+      "qty": 2,
+      "tileX": 6,
+      "tileY": 26,
+      "repeatable": false,
+      "journal": "berry_fruit",
+      "color": [
+        200,
+        40,
+        90
+      ]
+    },
+    {
+      "id": "pickup_mushroom",
+      "name": "Jamur Hutan",
+      "item": "forest_mushroom",
+      "qty": 1,
+      "tileX": 25,
+      "tileY": 3,
+      "repeatable": false,
+      "journal": "mushroom_shade",
+      "color": [
+        190,
+        165,
+        140
+      ]
+    },
+    {
+      "id": "pickup_aster",
+      "name": "Bunga Aster",
+      "item": "wild_aster",
+      "qty": 1,
+      "tileX": 31,
+      "tileY": 2,
+      "repeatable": false,
+      "journal": "flower_sun",
+      "color": [
+        230,
+        120,
+        220
+      ]
     }
   ]
 }

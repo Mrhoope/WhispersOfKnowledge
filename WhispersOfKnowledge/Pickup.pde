@@ -13,6 +13,7 @@ class Pickup {
   String journalId;     // entry Journal yang ditemukan saat diambil, "" jika tidak ada
   boolean collected = false;
   int r, g, b;          // warna placeholder
+  PImage sprite = null; // null = pakai lingkaran placeholder
 
   final float INTERACT_RANGE = 24;  // pixel dunia
 
@@ -46,8 +47,16 @@ class Pickup {
   }
 
   // Placeholder: lingkaran berwarna. Diganti sprite AI di Fase 5.
+  void setSprite(PImage img) {
+    sprite = img;
+  }
+
   void render() {
     if (!isAvailable()) return;
+    if (sprite != null) {
+      image(sprite, x - sprite.width / 2.0, y - sprite.height);
+      return;
+    }
     noStroke();
     fill(40, 40, 40, 70);
     ellipse(x, y, 10, 4);

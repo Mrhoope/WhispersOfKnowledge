@@ -82,6 +82,205 @@
           "next": -1
         }
       ]
+    },
+    {
+      "id": "merchant_intro",
+      "lines": [
+        {
+          "text": "Selamat datang di pasar Greenhaven! Aku Pedagang Pasar.",
+          "next": 1
+        },
+        {
+          "text": "Hari ini aku ingin menyiapkan keranjang buah, tapi tanganku penuh. Maukah kamu membantu?",
+          "choices": [
+            {
+              "text": "Tentu, apa yang harus kulakukan?",
+              "next": 2
+            },
+            {
+              "text": "Mungkin lain kali.",
+              "next": 4
+            }
+          ]
+        },
+        {
+          "text": "Kumpulkan 6 Beri Liar dari semak-semak di sebelah selatan jalan. Setelah itu kita bagi rata ke 3 keranjang.",
+          "next": 3,
+          "action": "start_quest:side_market;objective:side_market:0;discover:fair_trade"
+        },
+        {
+          "text": "Berdagang yang baik membuat kedua pihak senang. Kamu akan mendapat upah yang pantas.",
+          "next": -1
+        },
+        {
+          "text": "Baiklah. Aku di sini kalau kamu berubah pikiran.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "merchant_wait",
+      "lines": [
+        {
+          "text": "Sudah dapat 6 Beri Liar? Semaknya ada di selatan jalan. Satu semak memberi 2 beri.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "merchant_ready",
+      "lines": [
+        {
+          "text": "Wah, 6 Beri Liar! Sekarang kita bagi rata ke 3 keranjang.",
+          "next": 1
+        },
+        {
+          "text": "Berapa beri di setiap keranjang?",
+          "choices": [
+            {
+              "text": "2 beri",
+              "next": 3
+            },
+            {
+              "text": "3 beri",
+              "next": 2
+            },
+            {
+              "text": "4 beri",
+              "next": 2
+            }
+          ]
+        },
+        {
+          "text": "Hampir. Bayangkan membagikan beri satu per satu ke tiga keranjang sampai habis. Coba lagi!",
+          "next": 1
+        },
+        {
+          "text": "Benar! 6 ÷ 3 = 2. Pembagian rata berarti setiap bagian mendapat jumlah yang sama.",
+          "next": 4,
+          "action": "discover:math_division"
+        },
+        {
+          "text": "Ini upahmu: 3 Koin Perak. Terima kasih sudah membantu!",
+          "next": -1,
+          "action": "finish_quest:side_market"
+        }
+      ]
+    },
+    {
+      "id": "merchant_done",
+      "lines": [
+        {
+          "text": "Keranjangnya sudah rapi. Terima kasih lagi!",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "ranger_intro",
+      "lines": [
+        {
+          "text": "Hati-hati di Whispering Forest, pengembara. Aku menjaga hutan ini.",
+          "next": 1
+        },
+        {
+          "text": "Aku sedang meneliti: tanaman apa yang suka tempat teduh, dan apa yang suka tempat terang? Maukah kamu membantu?",
+          "choices": [
+            {
+              "text": "Aku ingin membantu.",
+              "next": 2
+            },
+            {
+              "text": "Nanti dulu.",
+              "next": 3
+            }
+          ]
+        },
+        {
+          "text": "Temukan satu Jamur Hutan dan satu Bunga Aster. Perhatikan di mana keduanya tumbuh!",
+          "next": -1,
+          "action": "start_quest:side_forest;objective:side_forest:0"
+        },
+        {
+          "text": "Baik. Hutan ini tidak akan ke mana-mana.",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "ranger_wait",
+      "lines": [
+        {
+          "text": "Cari Jamur Hutan dan Bunga Aster di dalam hutan. Amati: tempatnya teduh atau terang?",
+          "next": -1
+        }
+      ]
+    },
+    {
+      "id": "ranger_ready",
+      "lines": [
+        {
+          "text": "Kamu menemukan keduanya! Sekarang pertanyaan untuk pengamat sejati.",
+          "next": 1
+        },
+        {
+          "text": "Di mana Jamur Hutan biasanya tumbuh?",
+          "choices": [
+            {
+              "text": "Tempat teduh dan lembap",
+              "next": 3
+            },
+            {
+              "text": "Tempat terik tanpa naungan",
+              "next": 2
+            }
+          ]
+        },
+        {
+          "text": "Ingat tempat kamu menemukannya: dekat pohon yang rindang. Jamur menyukai tempat teduh dan lembap. Coba lagi!",
+          "next": 1
+        },
+        {
+          "text": "Tepat! Lalu bagaimana dengan Bunga Aster?",
+          "next": 4
+        },
+        {
+          "text": "Di mana Bunga Aster tumbuh subur?",
+          "choices": [
+            {
+              "text": "Tempat terbuka yang terkena sinar matahari",
+              "next": 6
+            },
+            {
+              "text": "Gua yang gelap",
+              "next": 5
+            }
+          ]
+        },
+        {
+          "text": "Ingat fotosintesis: tumbuhan hijau butuh cahaya untuk membuat makanan. Gua yang gelap kurang cocok. Coba lagi!",
+          "next": 4
+        },
+        {
+          "text": "Benar! Kamu baru saja mengelompokkan tanaman berdasarkan tempat tumbuhnya.",
+          "next": 7,
+          "action": "discover:classification"
+        },
+        {
+          "text": "Terima kasih, pengamat hutan. Ini hadiah kecil dari hutan.",
+          "next": -1,
+          "action": "finish_quest:side_forest"
+        }
+      ]
+    },
+    {
+      "id": "ranger_done",
+      "lines": [
+        {
+          "text": "Hutan ini lebih terawat berkat pengamat sepertimu.",
+          "next": -1
+        }
+      ]
     }
   ]
 }

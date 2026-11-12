@@ -71,6 +71,75 @@
           "garden_ecosystem"
         ]
       }
+    },
+    {
+      "id": "side_market",
+      "title": "Hitungan Pedagang",
+      "description": "Bantu pedagang pasar mengumpulkan dan membagi beri.",
+      "status": "AVAILABLE",
+      "objectives": [
+        {
+          "text": "Berbicara dengan pedagang pasar"
+        },
+        {
+          "text": "Mengumpulkan 6 Beri Liar (selatan jalan)",
+          "trigger": {
+            "type": "have_items",
+            "items": [
+              {
+                "id": "wild_berry",
+                "qty": 6
+              }
+            ]
+          }
+        },
+        {
+          "text": "Kembali kepada pedagang untuk membagi beri"
+        }
+      ],
+      "rewards": {
+        "items": [
+          {
+            "id": "silver_coin",
+            "qty": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "side_forest",
+      "title": "Mata Pengamat Hutan",
+      "description": "Bantu penjaga hutan meneliti tempat tumbuh tanaman.",
+      "status": "AVAILABLE",
+      "objectives": [
+        {
+          "text": "Berbicara dengan penjaga hutan"
+        },
+        {
+          "text": "Menemukan Jamur Hutan dan Bunga Aster",
+          "trigger": {
+            "type": "discover",
+            "ids": [
+              "mushroom_shade",
+              "flower_sun"
+            ]
+          }
+        },
+        {
+          "text": "Kembali kepada penjaga hutan"
+        }
+      ],
+      "rewards": {
+        "items": [
+          {
+            "id": "silver_coin",
+            "qty": 2
+          }
+        ],
+        "journal": [
+          "forest_habitat"
+        ]
+      }
     }
   ]
 }
