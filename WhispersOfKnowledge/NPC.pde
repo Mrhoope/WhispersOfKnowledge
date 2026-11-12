@@ -3,15 +3,31 @@
 // Posisi (x, y) adalah titik di KAKI karakter.
 // Logika jalannya dialog ada di DialogueSystem.
 
+// Aturan memilih dialog sesuai status quest.
+// state: "locked", "available", "active", "ready" (aktif dan tinggal kembali), "completed"
+class DialogueRule {
+  String questId;
+  String state;
+  String dialogueId;
+
+  DialogueRule(String questId, String state, String dialogueId) {
+    this.questId = questId;
+    this.state = state;
+    this.dialogueId = dialogueId;
+  }
+}
+
 class NPC {
   String id;
   String name;
   float x, y;
-  DialogueLine[] dialogue;
-  int timesTalked = 0;     // status interaksi
-  PImage sprite = null;    // null = pakai placeholder kotak
+  DialogueLine[] dialogue;            // dialog yang sedang dipakai
+  DialogueLine[] defaultDialogue;     // dialog bila tidak ada aturan yang cocok
+  ArrayList<DialogueRule> rules = new ArrayList<DialogueRule>();
+  int timesTalked = 0;                // status interaksi
+  PImage sprite = null;               // null = pakai placeholder kotak
 
-  final float INTERACT_RANGE = 28;  // pixel dunia
+  final float INTERACT_RANGE = 28;    // pixel dunia
 
   NPC(String id, String name, float x, float y, DialogueLine[] dialogue) {
     this.id = id;
@@ -19,6 +35,7 @@ class NPC {
     this.x = x;
     this.y = y;
     this.dialogue = dialogue;
+    this.defaultDialogue = dialogue;
   }
 
   void setSprite(PImage img) {
@@ -47,7 +64,11 @@ class NPC {
     dialogueSystem.start(this);
   }
 
-  DialogueLine[] getDialogue() { return dialogue; }
+  void addRule(DialogueRule r) { rules.add(r); }
+  ArrayList<DialogueRule> getRules() { return rules; }
+
+  DialogueLine[] getDialogue()        { return dialogue; }
+  DialogueLine[] getDefaultDialogue() { return defaultDialogue; }
   // Mengganti dialog, misalnya sesuai progres quest.
   void setDialogue(DialogueLine[] newDialogue) { dialogue = newDialogue; }
   void markTalked()            { timesTalked++; }

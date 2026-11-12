@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.4\
+**Versi:** 1.5\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -18,6 +18,11 @@
 ------------------------------------------------------------------------
 
 # Riwayat Revisi
+
+**v1.5**
+-   Konten game (item, resep, journal, quest, dialog, NPC, pickup) dan peta dipindahkan dari kode ke file JSON di `data/game-data/` dan `data/maps/` (14.1, 14.3). Format di `docs/DATA_FORMAT.md`.
+-   Class `DataLoader` ditambahkan. File data yang salah menampilkan pesan jelas di layar tanpa membuat game crash (14.2).
+-   Zona peta (misalnya Whispering Forest) didefinisikan di file peta, bukan di kode.
 
 **v1.4**
 -   Tombol `C` ditambahkan untuk membuka Crafting (5.2).
@@ -471,7 +476,7 @@ WhispersOfKnowledge/                  <- root repository
     ├── Game.pde   Camera.pde   Player.pde   World.pde
     ├── NPC.pde   DialogueSystem.pde   Pickup.pde   UI.pde
     ├── QuestManager.pde   Inventory.pde   CraftingSystem.pde
-    ├── Journal.pde   SaveManager.pde
+    ├── Journal.pde   SaveManager.pde   DataLoader.pde
     ├── data/
     │   ├── sprites/  tilesets/  maps/
     │   └── audio/    ui/        game-data/
@@ -565,10 +570,12 @@ Specification sebelum coding paralel.
 ## 14.3 Pengelolaan data
 
 Data quest, item, NPC, dan resep sebaiknya dipisahkan dari logika
-program jika memungkinkan. Format data adalah JSON memakai `JSONObject` dan
+program. Format data adalah JSON memakai `JSONObject` dan
 `JSONArray` bawaan Processing, sehingga tidak diperlukan library
-tambahan. Selama prototype, data contoh masih ditulis langsung di
-`Game.pde` dan dipindahkan ke `data/game-data/` secara bertahap.
+tambahan. Semua konten ada di `data/game-data/` (items, recipes, journal,
+quests, dialogues, npcs, pickups) dan peta di `data/maps/`. `DataLoader`
+memuat dan memvalidasinya saat game dimulai. Menambah NPC, side quest, atau
+item cukup mengedit file JSON (lihat `docs/DATA_FORMAT.md`).
 
 ------------------------------------------------------------------------
 
@@ -884,4 +891,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.4**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.5**

@@ -24,6 +24,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 1 | Struktur repo, README, CONTRIBUTING, `TECHNICAL_SPEC.md` (kontrak class), kerangka `Game` |
 | 3 | `Game`: state permainan dan `runAction()` yang menghubungkan dialog dengan quest, item, journal |
 | 4 | `QuestManager` (status, objective, `claimReward`) |
+| 5 | `DataLoader` (memuat dan memvalidasi JSON) dan `Game` yang tidak lagi memuat konten di kode |
 | 6 | `SaveManager` (saveGame, loadGame, getLastMessage) dan integrasi seluruh sistem |
 | 7 | Bug fixing, build final |
 
@@ -36,7 +37,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 2 | `Player` (gerak 4 arah, update, render) |
 | 2 | `Camera` (follow, apply) |
 | 2 | `World` (render tile map, `isBlocked()`), collision, batas area |
-| 5 | Memuat map Greenhaven Village dan Whispering Forest bersama Anggota 4 |
+| 5 | Pemuatan peta dari `data/maps/greenhaven.json` dan zona (selesai). Memperbaiki rendering bersama Anggota 4 saat tileset siap |
 
 ## Anggota 3: Game Systems & Interaction Programmer
 
@@ -48,6 +49,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 4 | `Inventory` (add, remove, has, quantity tidak boleh negatif) dan `Pickup` (benda yang bisa diambil) |
 | 4 | `CraftingSystem` (cek bahan sebelum mengurangi item, resep terkunci) dan layar Crafting (tombol C) di `UI` |
 | 4 | `Journal` (registerEntry, discover, addEntry, hasEntry) |
+| 5 | Mengisi konten MVP lewat JSON: 3 NPC, side quest, item, dan entry Journal (`data/game-data/`, panduan di `docs/DATA_FORMAT.md`) |
 | 6 | Menyempurnakan `UI` dan menambah Main Menu dan Crafting Interface (HUD, Inventory, Journal, Quest Log, Pause, Notification dasar sudah ada) |
 
 ## Anggota 4: AI Asset & World Designer
@@ -58,7 +60,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 |---|---|
 | 1 | Tentukan gaya visual dan template prompt, uji satu sprite dan satu tile di Processing |
 | 5 | Sprite player dan 3 NPC, tileset desa dan hutan, object (pohon, tanaman, rumah) |
-| 5 | Layout map Greenhaven Village dan sebagian Whispering Forest |
+| 5 | Layout map Greenhaven Village dan sebagian Whispering Forest dengan mengedit `rows` di `data/maps/greenhaven.json` (legenda karakter di `docs/DATA_FORMAT.md`) |
 | 5 | Ikon item dan elemen UI |
 | 6 | Audio (Should Have) |
 | Semua | Catat tiap aset di `docs/ASSET_CREDITS.md`, cek ketentuan lisensi tool AI |

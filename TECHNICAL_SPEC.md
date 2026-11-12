@@ -1,6 +1,6 @@
 # Technical Specification: Whispers of Knowledge
 
-Versi 1.2. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.4 bagian 14.
+Versi 1.3. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.5 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
 
 > Aturan: kontrak tidak boleh diubah sepihak. Jika perlu perubahan, diskusikan dulu, update dokumen ini, baru ubah kode.
 
@@ -35,15 +35,20 @@ Nilai default: window 960x540, target 60 FPS, `noSmooth()` aktif agar pixel art 
 
 | Method | Keterangan |
 |---|---|
-| `Game()` | Membuat semua sistem, memuat data awal |
+| `Game()` | Membuat semua sistem, memuat semua konten lewat `DataLoader.loadAll(this)`, membuat Player di posisi awal peta |
 | `void update()` | Dipanggil tiap frame. Hanya menggerakkan pemain saat state `PLAYING` |
 | `void render()` | Menggambar dunia lewat kamera, lalu UI sesuai state |
 | `void keyPressed()` / `void keyReleased()` | Menerima input keyboard |
 | `void runAction(String command)` | Menjalankan satu perintah aksi dialog (lihat bagian 4) |
-| `void checkQuestProgress()` | Memeriksa kondisi semua objective quest utama dan menandai yang terpenuhi. Dipanggil setelah pickup, crafting, masuk hutan, dan dialog |
+| `void checkQuestProgress()` | Memeriksa trigger objective **semua quest ACTIVE** dan menandai yang terpenuhi. Dipanggil setelah pickup, crafting, masuk zona, dan dialog |
+| `void checkZoneEntry()` | Mencatat zona peta yang baru dimasuki ke `visitedZones` dan menampilkan notifikasi |
+| `DialogueLine[] pickDialogueFor(NPC n)` | Memilih set dialog NPC: aturan (`DialogueRule`) pertama yang cocok dengan status quest, atau dialog bawaan |
+| `boolean isTriggerMet(Trigger t)` | Menilai satu trigger objective (lihat DATA_FORMAT.md) |
 | `String getInteractPrompt()` | Teks petunjuk interaksi terdekat, `null` jika tidak ada |
 
-Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`.
+Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `quests`, `crafting`, `dialogue`, `saveManager`, `ui`, `state`, `dialogueSets` (`HashMap<String, DialogueLine[]>`), `visitedZones` (`HashSet<String>`), `dataErrors` (`ArrayList<String>`).
+
+`Game` **tidak lagi menulis konten**. Item, resep, quest, dialog, NPC, dan pickup dibaca dari `data/` oleh `DataLoader` (bagian 3.14).
 
 ### 3.2 `Camera` (Anggota 2)
 
@@ -68,11 +73,15 @@ Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `
 
 | Method | Keterangan |
 |---|---|
-| `World(int tilesWide, int tilesHigh)` | Ukuran map dalam tile |
+| `World(int tilesWide, int tilesHigh)` | Ukuran map dalam tile. Membuat peta placeholder cadangan (termasuk zona `forest`) |
+| `boolean loadFromJson(JSONObject o, ArrayList<String> errors)` | Memuat peta dari JSON. Memeriksa `width`, `height`, `rows`, karakter, zona, dan `playerStart`. Peta baru **dipakai hanya bila semuanya valid**; bila tidak, `false` dan peta cadangan tetap dipakai |
 | `void render(float camX, float camY, float viewW, float viewH)` | Menggambar hanya tile yang terlihat |
 | `boolean isBlocked(int tileX, int tileY)` | `true` jika tile menghalangi atau di luar map |
 | `boolean isBlockedPx(float px, float py)` | Sama, dalam pixel dunia |
-| `boolean isForest(int tileX, int tileY)` / `boolean isForestPx(float px, float py)` | `true` jika berada di zona Whispering Forest (tile x >= 20 dan y <= 14). Rumput hutan digambar sedikit lebih gelap |
+| `Zone getZone(String id)` / `ArrayList<Zone> getZones()` | Zona dari peta (`Zone`: `id`, `name`, `x1`, `y1`, `x2`, `y2`, `contains(tileX, tileY)`) |
+| `boolean isInZone(String id, int tileX, int tileY)` / `isInZonePx(String id, float px, float py)` | `true` jika di dalam zona |
+| `boolean isForest(int tileX, int tileY)` / `isForestPx(float px, float py)` | Singkatan untuk zona `forest`. Rumput hutan digambar sedikit lebih gelap |
+| `float getStartX()` / `getStartY()` | Posisi awal pemain (pixel, kaki) dari `playerStart` |
 | `int getPixelWidth()` / `int getPixelHeight()` | Ukuran dunia dalam pixel |
 
 ### 3.5 `NPC` (Anggota 3)
@@ -86,6 +95,8 @@ Field: `world`, `camera`, `player`, `npcs`, `pickups`, `inventory`, `journal`, `
 | `void interact(DialogueSystem ds)` | Memulai dialog dengan NPC ini |
 | `DialogueLine[] getDialogue()` | Data dialog |
 | `void setDialogue(DialogueLine[] d)` | Mengganti dialog, misalnya sesuai progres quest |
+| `void addRule(DialogueRule r)` / `ArrayList<DialogueRule> getRules()` | Aturan pemilihan dialog. `DialogueRule`: `questId`, `state`, `dialogueId` |
+| `DialogueLine[] getDefaultDialogue()` | Dialog bawaan bila tidak ada aturan yang cocok |
 | `void markTalked()` / `int getTimesTalked()` | Status interaksi |
 | `String getId()` / `getName()` / `float getX()` / `getY()` | Getter |
 
@@ -125,6 +136,7 @@ UI hanya **menggambar**. Data dan logika tetap di class masing-masing.
 | `void renderCrafting(CraftingSystem crafting, Inventory inv, int selected)` | Layar Crafting: resep terbuka, bahan (dimiliki/butuh), hasil |
 | `void showNotification(String message)` / `void renderNotification()` | Notifikasi 3,5 detik. Maksimal 3 bertumpuk, yang terlama dibuang |
 | `void scrollBy(int delta)` / `void resetScroll()` | Menggulir panel yang isinya panjang (Inventory, Journal, Quest Log) |
+| `void renderDataErrors(ArrayList<String> errors)` | Kotak merah berisi maksimal 4 pesan masalah data (kosong = tidak digambar) |
 
 Belum ada: Main Menu (Fase 6).
 
@@ -143,7 +155,10 @@ Belum ada: Main Menu (Fase 6).
 | `Quest getQuest(String id)` | `null` jika tidak ada |
 | `ArrayList<Quest> getAllQuests()` | Semua quest sesuai urutan daftar |
 
-`Quest`: `id`, `title`, `description`, `status`, `objectives` (String[]), `done` (boolean[]), `rewardGiven`.
+`Quest`: `id`, `title`, `description`, `status`, `objectives` (String[]), `done` (boolean[]), `rewardGiven`, `triggers` (`Trigger[]`, satu per objective, `null` = manual), `reward` (`QuestReward`), dan `boolean readyToReturn()` (semua objective selain yang terakhir selesai).
+
+`Trigger`: `type` (`manual`, `enter_zone`, `discover`, `have_items`), `zoneId`, `discoverIds`, `itemIds`, `itemQty`, `orDiscover`.
+`QuestReward`: `itemIds`, `itemQty`, `recipeIds`, `journalIds`.
 
 ### 3.9 `Inventory` (Anggota 3)
 
@@ -208,9 +223,20 @@ Benda di dunia yang diambil dengan tombol E (tanaman, bahan, sumber air).
 | `void render()` | Menggambar (lingkaran placeholder). Tidak menggambar apa pun jika sudah diambil |
 | `getId()` / `getName()` / `getItemId()` / `getQuantity()` / `getJournalId()` / `getX()` / `getY()` | Getter |
 
+### 3.14 `DataLoader` (Anggota 1)
+
+Memuat semua konten dari `data/`. File yang salah **tidak membuat game crash**: tiap masalah dicatat sebagai pesan dan game jalan dengan data yang berhasil dimuat.
+
+| Method | Keterangan |
+|---|---|
+| `void loadAll(Game g)` | Urutan: peta, item, resep, journal, quest, dialog, NPC, pickup, lalu validasi. Setiap langkah dibungkus try/catch. Pesan dicetak ke console dengan awalan `[DATA]` dan disimpan di `g.dataErrors` |
+| `JSONObject readJson(String path)` | Membaca satu file, `null` + pesan bila hilang atau JSON rusak |
+| `Trigger parseTrigger(JSONObject t, String where)` / `QuestReward parseReward(JSONObject r)` | Penerjemah bagian quest |
+| `void validate(Game g)` | Memeriksa semua rujukan antar file (item, entry, quest, dialog, zona), rentang `next` dialog, perintah aksi, dan pickup di tile yang menghalangi |
+
 ## 4. Format Dialog dan Aksi
 
-Dialog adalah array `DialogueLine`. Contoh (penjaga taman):
+Dialog adalah array `DialogueLine`. Di game, dialog ditulis di `data/game-data/dialogues.json` (format di DATA_FORMAT.md). Berikut bentuk setara di kode (penjaga taman):
 
 ```java
 DialogueLine[] talk = new DialogueLine[] {
@@ -233,9 +259,9 @@ DialogueLine[] talk = new DialogueLine[] {
 | `discover:<journalEntryId>` | Menandai entry Journal ditemukan |
 | `finish_quest:<questId>` | Menandai objective terakhir, menyelesaikan quest **jika semua objective selesai**, lalu memberi reward satu kali |
 
-Perintah baru ditambahkan di `Game.runAction()` dan didaftarkan di tabel ini.
+Perintah baru ditambahkan di `Game.runAction()`, divalidasi di `DataLoader.validateAction()`, dan didaftarkan di tabel ini.
 
-Dialog sebuah NPC dapat diganti sesuai progres lewat `NPC.setDialogue()`. Contoh: `Game.pickGardenerDialogue()` memilih salah satu dari empat dialog penjaga taman (belum menerima quest, quest aktif, siap kembali, quest selesai).
+Dialog NPC dipilih sesuai progres lewat `rules` di `npcs.json`: `Game.pickDialogueFor(NPC)` memakai aturan pertama yang cocok (`locked`, `available`, `active`, `ready`, `completed`), jika tidak ada maka dialog bawaan.
 
 ## 5. Kontrol
 
@@ -251,7 +277,9 @@ Dialog sebuah NPC dapat diganti sesuai progres lewat `NPC.setDialogue()`. Contoh
 
 | Tab | Pemilik |
 |---|---|
-| `WhispersOfKnowledge.pde`, `Game.pde`, `QuestManager.pde`, `SaveManager.pde` | Anggota 1 |
+| `WhispersOfKnowledge.pde`, `Game.pde`, `QuestManager.pde`, `SaveManager.pde`, `DataLoader.pde` | Anggota 1 |
+| `data/game-data/*.json` (konten) | Anggota 3 (item, resep, journal, dialog, NPC, quest, pickup), disetujui Anggota 1 |
+| `data/maps/*.json` (peta) | Anggota 2 (format) dan Anggota 4 (layout) |
 | `Player.pde`, `World.pde`, `Camera.pde` | Anggota 2 |
 | `NPC.pde`, `DialogueSystem.pde`, `Pickup.pde`, `UI.pde`, `Inventory.pde`, `CraftingSystem.pde`, `Journal.pde` | Anggota 3 |
 
@@ -271,7 +299,7 @@ File `saves/save.json` di dalam folder sketch (masuk `.gitignore`), dibuat denga
     "forgotten_garden": { "status": "ACTIVE", "done": [true, false, false, false, false, false], "rewardGiven": false }
   },
   "npcTalked": { "npc_gardener": 3 },
-  "forestVisited": true,
+  "visitedZones": ["forest"],
   "pickupsCollected": ["pickup_leaf_1"],
   "recipesUnlocked": ["herbal_tea", "garden_tonic"]
 }
@@ -279,7 +307,7 @@ File `saves/save.json` di dalam folder sketch (masuk `.gitignore`), dibuat denga
 
 ## 8. Skenario *The Forgotten Garden* (data contoh)
 
-Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Data masih ditulis di `Game.setupContent()` dan dipindah ke `data/game-data/` secara bertahap.
+Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Seluruh datanya ada di `data/game-data/` dan `data/maps/greenhaven.json`.
 
 **Objective dan pemicunya**
 
@@ -309,7 +337,7 @@ Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Da
 
 ## 9. Cara Menguji
 
-1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run. Di tab terlihat 14 file `.pde`.
+1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run. Di tab terlihat 15 file `.pde`. **Tidak boleh ada kotak merah** di layar (artinya semua file data valid).
 2. **Sebelum quest:** jalan ke timur melewati jalan cokelat sampai rumput lebih gelap. Notifikasi "Kamu memasuki Whispering Forest" muncul. Dekati lingkaran hijau di sekitar tile (22, 6): prompt `[E] Ambil Green Leaf`. Tekan E, masuk Inventory (I) dan Journal (J).
 3. Tekan **C**: layar Crafting menampilkan Herbal Tea dengan bahan `Green Leaf (1/2), Water (0/1)`. Tekan E: notifikasi "Bahan tidak cukup", inventory tidak berubah. Tekan C untuk menutup.
 4. **Terima quest:** dekati kotak oranye (penjaga taman), tekan E sampai muncul pilihan, pilih "Ya, aku akan membantu" dengan W/S lalu E. Cek Quest Log (Q): objective 1 dan 2 sudah `[x]`. Di kiri atas ada kotak "Tujuan: ..." yang mengikuti objective berikutnya.
@@ -322,12 +350,12 @@ Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Da
 
 ## 10. Status Pengujian dan Batasan
 
-**Pengujian:** logika alur lengkap (87 pemeriksaan: pickup, quest, crafting, reward sekali, dialog bercabang, gulir panel, render semua state) lulus dengan harness otomatis yang memakai stub API Processing. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
+**Pengujian:** 105 pemeriksaan otomatis lulus dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
 
 **Batasan yang diketahui:**
 
-- Belum ada Save/Load. Progres `forestVisited`, pickup yang sudah diambil, dan resep terbuka harus ikut disimpan saat `SaveManager` dibuat (lihat bagian 7).
-- Quest utama masih memakai ID tetap (`forgotten_garden`) di `Game`. Side quest dan NPC lain butuh pengaturan umum (data JSON) di Fase 5.
-- Peta, zona hutan, dan letak benda masih ditulis di kode (placeholder).
+- Belum ada Save/Load. Progres `visitedZones`, pickup yang sudah diambil, dan resep terbuka harus ikut disimpan saat `SaveManager` dibuat (lihat bagian 7).
+- Satu peta (`greenhaven.json`). Perpindahan antar peta belum ada.
+- Jenis trigger, perintah aksi, dan karakter tile baru masih perlu kode.
 - Tidak ada pesan "inventory penuh" karena jumlah slot tidak dibatasi.
 - Layar Journal belum menampilkan entry yang belum ditemukan (sengaja disembunyikan).

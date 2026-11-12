@@ -1,0 +1,53 @@
+{
+  "entries": [
+    {
+      "id": "plants_need_light",
+      "title": "Tanaman Butuh Cahaya",
+      "category": "Biology",
+      "description": "Tumbuhan membuat makanannya sendiri dengan bantuan cahaya matahari.",
+      "learningInfo": "Proses ini disebut fotosintesis."
+    },
+    {
+      "id": "plant_green_leaf",
+      "title": "Daun Hijau",
+      "category": "Biology",
+      "description": "Daun berwarna hijau karena mengandung klorofil.",
+      "learningInfo": "Klorofil menangkap cahaya matahari untuk fotosintesis."
+    },
+    {
+      "id": "plant_sunpetal",
+      "title": "Bunga Sunpetal",
+      "category": "Biology",
+      "description": "Bunga kuning ini mekar saat pagi dan didatangi lebah.",
+      "learningInfo": "Serangga membantu penyerbukan, yaitu memindahkan serbuk sari agar tumbuhan dapat berbiak."
+    },
+    {
+      "id": "plant_moon_fern",
+      "title": "Pakis Moon Fern",
+      "category": "Biology",
+      "description": "Pakis tumbuh di tempat teduh dan lembap.",
+      "learningInfo": "Pakis berkembang biak dengan spora, bukan dengan biji."
+    },
+    {
+      "id": "water_source",
+      "title": "Air Kolam",
+      "category": "Science",
+      "description": "Air kolam bening dan bisa disaring untuk ramuan.",
+      "learningInfo": "Air dapat berwujud cair, padat (es), dan gas (uap), tergantung suhunya."
+    },
+    {
+      "id": "herbal_tea_recipe",
+      "title": "Resep Herbal Tea",
+      "category": "Alchemy",
+      "description": "2 Green Leaf dan 1 Water menghasilkan 1 Herbal Tea.",
+      "learningInfo": "Resep menetapkan bahan dan takaran. Takaran yang kurang membuat ramuan gagal dibuat."
+    },
+    {
+      "id": "garden_ecosystem",
+      "title": "Taman sebagai Ekosistem",
+      "category": "Biology",
+      "description": "Tanaman, serangga, jamur, dan air di taman saling membutuhkan.",
+      "learningInfo": "Ekosistem adalah hubungan saling bergantung antara makhluk hidup dan lingkungannya."
+    }
+  ]
+}

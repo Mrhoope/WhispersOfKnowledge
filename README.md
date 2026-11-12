@@ -5,7 +5,7 @@ Game edukasi **2D top-down pixel art adventure RPG** yang dibuat dengan **Proces
 Pemain menjelajahi dunia fantasi (desa, hutan, taman alkimia, perpustakaan), berbicara dengan NPC, menyelesaikan quest, dan melakukan crafting. Pembelajaran terjadi lewat aktivitas bermain, bukan sekadar tanya-jawab.
 
 > **Status:** Fase 2 terverifikasi. Skenario *The Forgotten Garden* dapat dimainkan dengan visual placeholder
-> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.4
+> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.5
 
 ## Fitur MVP
 
@@ -76,10 +76,11 @@ WhispersOfKnowledge/                  <- root repo
     ├── WhispersOfKnowledge.pde
     ├── Game  Camera  Player  World          (.pde)
     ├── NPC  DialogueSystem  Pickup  UI      (.pde)
-    ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  (.pde)
+    ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  DataLoader  (.pde)
     └── data/
-        ├── sprites/  tilesets/  maps/
-        └── audio/    ui/        game-data/
+        ├── sprites/  tilesets/  audio/  ui/
+        ├── maps/        greenhaven.json
+        └── game-data/   items, recipes, journal, quests, dialogues, npcs, pickups (.json)
 ```
 
 Catatan: Processing hanya mengenali file `.pde` di folder sketch dan aset di `data/`. Tiap class dibuat sebagai tab `.pde` terpisah.
@@ -88,6 +89,7 @@ Catatan: Processing hanya mengenali file `.pde` di folder sketch dan aset di `da
 
 - [PRD.md](PRD.md): kebutuhan produk
 - [TECHNICAL_SPEC.md](TECHNICAL_SPEC.md): kontrak class
+- [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md): cara menambah NPC, quest, item, dan peta lewat file JSON
 - [CONTRIBUTING.md](CONTRIBUTING.md): aturan kolaborasi tim
 - [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md): pembagian tugas
 - [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md): catatan aset AI

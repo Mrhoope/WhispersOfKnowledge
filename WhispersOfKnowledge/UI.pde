@@ -102,6 +102,23 @@ class UI {
     }
   }
 
+  // Kotak merah berisi masalah pemuatan data (maksimal 4 baris), selama masih ada masalah.
+  void renderDataErrors(ArrayList<String> errors) {
+    if (errors == null || errors.isEmpty()) return;
+    int shown = min(4, errors.size());
+    float h = 26 + shown * 18;
+    noStroke();
+    fill(90, 0, 0, 220);
+    rect(10, height - h - 10, width - 20, h, 6);
+    fill(255, 200, 200);
+    textSize(12);
+    textAlign(LEFT, TOP);
+    text("Masalah data (" + errors.size() + "). Periksa file di folder data/:", 20, height - h - 4);
+    for (int i = 0; i < shown; i++) {
+      text("- " + errors.get(i), 20, height - h + 16 + i * 18);
+    }
+  }
+
   // ---------- Dialog ----------
 
   void renderDialogue(DialogueSystem dialogue) {
