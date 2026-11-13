@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.9\
+**Versi:** 1.10\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -18,6 +18,9 @@
 ------------------------------------------------------------------------
 
 # Riwayat Revisi
+
+**v1.10**
+-   Panduan pengujian manual (`docs/TESTING.md`) dan catatan pengembangan (`docs/DEVELOPMENT_LOG.md`) ditambahkan.
 
 **v1.9**
 -   Jalur aset visual dibuat (13): gambar dimuat opsional dari `data/sprites/` dan `data/tilesets/`, placeholder dipakai bila belum ada. Panduan di `docs/ASSET_GUIDE.md`, skrip `tools/prepare_asset.py`. Class `Assets` ditambahkan (14.2).
@@ -906,4 +909,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.9**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.10**

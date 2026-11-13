@@ -1,6 +1,6 @@
 # Technical Specification: Whispers of Knowledge
 
-Versi 1.7. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.9 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
+Versi 1.8. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.9 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
 
 > Aturan: kontrak tidak boleh diubah sepihak. Jika perlu perubahan, diskusikan dulu, update dokumen ini, baru ubah kode.
 
@@ -379,25 +379,11 @@ Item baru: `wild_berry`, `forest_mushroom`, `wild_aster`, `silver_coin`. Entry J
 
 ## 9. Cara Menguji
 
-1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run. Di tab terlihat 15 file `.pde`. **Tidak boleh ada kotak merah** di layar (artinya semua file data valid).
-2. **Sebelum quest:** jalan ke timur melewati jalan cokelat sampai rumput lebih gelap. Notifikasi "Kamu memasuki Whispering Forest" muncul. Dekati lingkaran hijau di sekitar tile (22, 6): prompt `[E] Ambil Green Leaf`. Tekan E, masuk Inventory (I) dan Journal (J).
-3. Tekan **C**: layar Crafting menampilkan Herbal Tea dengan bahan `Green Leaf (1/2), Water (0/1)`. Tekan E: notifikasi "Bahan tidak cukup", inventory tidak berubah. Tekan C untuk menutup.
-4. **Terima quest:** dekati kotak oranye (penjaga taman), tekan E sampai muncul pilihan, pilih "Ya, aku akan membantu" dengan W/S lalu E. Cek Quest Log (Q): objective 1 dan 2 sudah `[x]`. Di kiri atas ada kotak "Tujuan: ..." yang mengikuti objective berikutnya.
-5. **Kumpulkan:** ambil Green Leaf kedua, Sunpetal, Moon Fern (objective tanaman selesai), lalu air di kolam. Air bisa diambil berulang.
-6. **Bicara sebelum siap:** dialog pengingat tampil ("Hutan ada di timur jalan...").
-7. **Crafting:** tekan C lalu E. Herbal Tea masuk inventory, bahan berkurang, notifikasi muncul, Journal bertambah entry resep.
-8. **Selesaikan:** bicara dengan penjaga taman. Dialog "Kamu membawa Herbal Tea!" tampil, quest selesai, dan muncul tiga notifikasi reward. Resep kedua (Garden Tonic) muncul di layar Crafting.
-9. **Reward tidak berulang:** bicara lagi dengan penjaga taman. Garden Seed tetap x1.
-10. Buka Journal: bila isinya panjang, W/S menggulir panel. ESC menutup dialog atau layar, atau menjeda permainan.
-0. **Main Menu:** saat game dibuka tampil menu. Tanpa data simpanan, pilihan awal adalah "Permainan Baru" dan "Lanjutkan" redup. Dengan data simpanan, pilihan awal adalah "Lanjutkan".
-11. **Simpan dan muat:** setelah menerima quest dan mengambil beberapa benda, tekan **F5** (notifikasi "Permainan disimpan."). Ambil benda lain, lalu tekan **F9**: inventory, Journal, quest, dan posisi kembali seperti saat F5, dan benda yang tadi diambil muncul lagi. Di layar Pause (ESC), **K** menyimpan dan **L** memuat. Folder `WhispersOfKnowledge/saves/` dibuat otomatis.
-12. **Aset (opsional):** salin isi `docs/asset-test/` ke `WhispersOfKnowledge/data/` (lihat `docs/ASSET_GUIDE.md`). Console menampilkan daftar `[ASET]`, dan rumput, jalan, air, pohon, penjaga taman, dan daun tampil bergambar. Hapus file itu lagi setelah mencoba.
-13. **Side quest:** bicara dengan Pedagang Pasar (dekat jalan, barat tengah), terima, ambil beri di 3 semak selatan jalan, kembali, jawab pertanyaan (coba jawaban salah dulu). Bicara dengan Penjaga Hutan (tepi barat hutan), terima, temukan jamur dan aster di hutan, kembali dan jawab dua pertanyaan. Cek Journal bertambah dan Inventory berisi Koin Perak.
-14. **Muat di sesi baru:** tutup game, jalankan lagi, tekan F9 atau ESC lalu L. Progres harus kembali. Hapus `saves/save.json`, lalu F9: muncul pesan "Belum ada data simpanan."
+Langkah pengujian manual lengkap ada di [docs/TESTING.md](docs/TESTING.md): uji cepat untuk setiap pull request, alur utama, side quest, simpan dan muat, data dan aset, format laporan bug, dan syarat sebuah pull request boleh digabung.
 
 ## 10. Status Pengujian dan Batasan
 
-**Pengujian:** 231 pemeriksaan otomatis lulus (110 untuk data dan alur, 43 untuk Save/Load, 24 untuk Main Menu, 38 untuk konten side quest, 16 untuk pemuatan aset: tanpa aset, dengan aset, cadangan `player.png`, dan PNG rusak) dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. Save/Load: simpan di tengah quest lalu muat, muat di game baru, reward tidak berulang, 11 jenis file simpanan rusak ditolak tanpa mengubah game, penulisan gagal, dan tombol F5/F9/K/L. Main Menu: navigasi berputar, Lanjutkan tanpa save, Permainan Baru mereset semua progres, kembali ke menu dari Pause lalu Lanjutkan, dan Keluar. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
+**Pengujian:** 231 pemeriksaan otomatis lulus (110 untuk data dan alur, 43 untuk Save/Load, 24 untuk Main Menu, 38 untuk konten side quest, 16 untuk pemuatan aset: tanpa aset, dengan aset, cadangan `player.png`, dan PNG rusak) dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. Save/Load: simpan di tengah quest lalu muat, muat di game baru, reward tidak berulang, 11 jenis file simpanan rusak ditolak tanpa mengubah game, penulisan gagal, dan tombol F5/F9/K/L. Main Menu: navigasi berputar, Lanjutkan tanpa save, Permainan Baru mereset semua progres, kembali ke menu dari Pause lalu Lanjutkan, dan Keluar. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai [docs/TESTING.md](docs/TESTING.md).
 
 **Batasan yang diketahui:**
 
