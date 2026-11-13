@@ -160,21 +160,49 @@ class World {
     }
   }
 
+  // Gambar tile (opsional, null = pakai warna placeholder).
+  PImage imgGrass, imgForestGrass, imgDirt, imgWater, imgTree;
+
+  void setTileImages(PImage grass, PImage forestGrass, PImage dirt, PImage water, PImage tree) {
+    imgGrass = grass;
+    imgForestGrass = forestGrass;
+    imgDirt = dirt;
+    imgWater = water;
+    imgTree = tree;
+  }
+
   void drawTile(int type, int px, int py) {
     if (type == WATER) {
-      fill(70, 130, 200);
-      rect(px, py, TILE_SIZE, TILE_SIZE);
-    } else if (type == PATH) {
-      fill(190, 160, 110);
-      rect(px, py, TILE_SIZE, TILE_SIZE);
-    } else {
-      if (isForest(px / TILE_SIZE, py / TILE_SIZE)) {
-        fill(78, 140, 68);   // rumput hutan sedikit lebih gelap
+      if (imgWater != null) {
+        image(imgWater, px, py);
       } else {
-        fill(96, 160, 80);
+        fill(70, 130, 200);
+        rect(px, py, TILE_SIZE, TILE_SIZE);
       }
-      rect(px, py, TILE_SIZE, TILE_SIZE);
-      if (type == TREE) {
+    } else if (type == PATH) {
+      if (imgDirt != null) {
+        image(imgDirt, px, py);
+      } else {
+        fill(190, 160, 110);
+        rect(px, py, TILE_SIZE, TILE_SIZE);
+      }
+    } else {
+      boolean forest = isForest(px / TILE_SIZE, py / TILE_SIZE);
+      PImage ground = (forest && imgForestGrass != null) ? imgForestGrass : imgGrass;
+      if (ground != null) {
+        image(ground, px, py);
+      } else {
+        if (forest) {
+          fill(78, 140, 68);   // rumput hutan sedikit lebih gelap
+        } else {
+          fill(96, 160, 80);
+        }
+        rect(px, py, TILE_SIZE, TILE_SIZE);
+      }
+      if (type == TREE && imgTree != null) {
+        // pohon: bagian bawah gambar sejajar dengan bawah tile
+        image(imgTree, px + TILE_SIZE / 2.0 - imgTree.width / 2.0, py + TILE_SIZE - imgTree.height);
+      } else if (type == TREE) {
         fill(110, 75, 40);
         rect(px + 6, py + 9, 4, 7);    // batang
         fill(40, 110, 50);

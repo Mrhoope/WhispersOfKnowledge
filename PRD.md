@@ -2,7 +2,7 @@
 
 ## Product Requirements Document (PRD)
 
-**Versi:** 1.7\
+**Versi:** 1.10\
 **Status:** Revisi --- siap menjadi acuan pengembangan\
 **Genre:** Educational Adventure RPG\
 **Engine:** Processing 4 (Java Mode)\
@@ -18,6 +18,15 @@
 ------------------------------------------------------------------------
 
 # Riwayat Revisi
+
+**v1.10**
+-   Panduan pengujian manual (`docs/TESTING.md`) dan catatan pengembangan (`docs/DEVELOPMENT_LOG.md`) ditambahkan.
+
+**v1.9**
+-   Jalur aset visual dibuat (13): gambar dimuat opsional dari `data/sprites/` dan `data/tilesets/`, placeholder dipakai bila belum ada. Panduan di `docs/ASSET_GUIDE.md`, skrip `tools/prepare_asset.py`. Class `Assets` ditambahkan (14.2).
+
+**v1.8**
+-   Konten MVP draf ditambahkan lewat JSON: tiga NPC dan dua side quest (Hitungan Pedagang, Mata Pengamat Hutan) dengan soal edukasi di dialog (7.2, 8, 9).
 
 **v1.7**
 -   Main Menu dibuat (12): Lanjutkan, Permainan Baru, Keluar. Dari layar Pause, `M` kembali ke Main Menu.
@@ -484,7 +493,7 @@ WhispersOfKnowledge/                  <- root repository
     ├── Game.pde   Camera.pde   Player.pde   World.pde
     ├── NPC.pde   DialogueSystem.pde   Pickup.pde   UI.pde
     ├── QuestManager.pde   Inventory.pde   CraftingSystem.pde
-    ├── Journal.pde   SaveManager.pde   DataLoader.pde
+    ├── Journal.pde   SaveManager.pde   DataLoader.pde   Assets.pde
     ├── data/
     │   ├── sprites/  tilesets/  maps/
     │   └── audio/    ui/        game-data/
@@ -900,4 +909,4 @@ Buat satu area kecil yang dapat dimainkan. Pastikan player movement,
 world, interaction, quest, journal, inventory, dan crafting terhubung.
 Setelah MVP stabil, barulah perluas dunia permainan.
 
-**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.7**
+**END OF DOCUMENT --- WHISPERS OF KNOWLEDGE PRD v1.10**

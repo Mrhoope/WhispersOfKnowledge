@@ -1,6 +1,6 @@
 # Technical Specification: Whispers of Knowledge
 
-Versi 1.5. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.7 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
+Versi 1.8. Dokumen ini menetapkan **kontrak class** (nama method, parameter, tipe data) sebelum coding paralel. Acuan: PRD v1.9 bagian 14. Format file data JSON ada di [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md).
 
 > Aturan: kontrak tidak boleh diubah sepihak. Jika perlu perubahan, diskusikan dulu, update dokumen ini, baru ubah kode.
 
@@ -228,6 +228,18 @@ Benda di dunia yang diambil dengan tombol E (tanaman, bahan, sumber air).
 | `void render()` | Menggambar (lingkaran placeholder). Tidak menggambar apa pun jika sudah diambil |
 | `getId()` / `getName()` / `getItemId()` / `getQuantity()` / `getJournalId()` / `getX()` / `getY()` | Getter |
 
+### 3.15 `Assets` dan pemasangan gambar (Anggota 1)
+
+Gambar bersifat **opsional**: yang tidak ada memakai placeholder. Aturan nama dan ukuran ada di [docs/ASSET_GUIDE.md](docs/ASSET_GUIDE.md).
+
+| Method | Keterangan |
+|---|---|
+| `PImage get(String path)` | Memuat `data/<path>`. `null` bila file tidak ada atau rusak (tidak crash). Hasil di-cache |
+| `PImage first(String pathA, String pathB)` | Gambar pertama yang ada |
+| `void printSummary()` | Mencetak daftar gambar yang terpakai (`[ASET] ...`) |
+
+`Game.applyAssets()` memasang gambar setelah data dimuat: `World.setTileImages(grass, forestGrass, dirt, water, tree)`, `Player.setSprite(facing, img)` dan `Player.setFallbackSprite(img)`, `NPC.setSprite(img)` (file `sprites/<idNpc>.png`), dan `Pickup.setSprite(img)` (file `sprites/item_<idItem>.png`). Setiap `render()` memakai gambar bila ada, kalau tidak ada memakai placeholder.
+
 ### 3.14 `DataLoader` (Anggota 1)
 
 Memuat semua konten dari `data/`. File yang salah **tidak membuat game crash**: tiap masalah dicatat sebagai pesan dan game jalan dengan data yang berhasil dimuat.
@@ -285,7 +297,8 @@ Dialog NPC dipilih sesuai progres lewat `rules` di `npcs.json`: `Game.pickDialog
 
 | Tab | Pemilik |
 |---|---|
-| `WhispersOfKnowledge.pde`, `Game.pde`, `QuestManager.pde`, `SaveManager.pde`, `DataLoader.pde` | Anggota 1 |
+| `WhispersOfKnowledge.pde`, `Game.pde`, `QuestManager.pde`, `SaveManager.pde`, `DataLoader.pde`, `Assets.pde` | Anggota 1 |
+| `data/sprites/`, `data/tilesets/` (gambar) | Anggota 4 |
 | `data/game-data/*.json` (konten) | Anggota 3 (item, resep, journal, dialog, NPC, quest, pickup), disetujui Anggota 1 |
 | `data/maps/*.json` (peta) | Anggota 2 (format) dan Anggota 4 (layout) |
 | `Player.pde`, `World.pde`, `Camera.pde` | Anggota 2 |
@@ -346,25 +359,31 @@ Skenario ini bisa dimainkan dari awal sampai akhir dengan visual placeholder. Se
 
 **Reward (sekali saja, lewat `claimReward`):** Garden Seed x1, resep Garden Tonic, entry Journal "Taman sebagai Ekosistem".
 
+### 8.1 Konten MVP tambahan (draf, bisa diubah lewat JSON)
+
+Tiga NPC dan dua side quest (syarat MVP di PRD). Semuanya ditulis hanya di file JSON, tanpa kode baru. Soal edukasi memakai dialog bercabang: jawaban salah memberi petunjuk lalu mengulang pertanyaan, jawaban benar menemukan entry Journal.
+
+| NPC | Tile | Quest | Materi | Alur |
+|---|---|---|---|---|
+| Penjaga Taman | (12, 9) | `forgotten_garden` (utama) | Biologi, alkimia | Lihat bagian 8 |
+| Pedagang Pasar | (16, 13) | `side_market` "Hitungan Pedagang" | Matematika (pembagian), interaksi sosial | Terima quest, kumpulkan 6 Beri Liar dari 3 semak (2 beri per semak), jawab "6 beri dibagi 3 keranjang", reward 3 Koin Perak |
+| Penjaga Hutan | (21, 12) | `side_forest` "Mata Pengamat Hutan" | Biologi (habitat), logika (mengelompokkan) | Terima quest, temukan Jamur Hutan dan Bunga Aster, jawab dua pertanyaan tempat tumbuh, reward 2 Koin Perak dan entry Habitat Hutan |
+
+| Benda baru | Tile |
+|---|---|
+| Semak Beri (3) | (8, 18), (14, 22), (6, 26), masing-masing 2 beri |
+| Jamur Hutan | (25, 3), dekat pohon |
+| Bunga Aster | (31, 2), tempat terbuka |
+
+Item baru: `wild_berry`, `forest_mushroom`, `wild_aster`, `silver_coin`. Entry Journal baru: `berry_fruit`, `fair_trade`, `math_division`, `mushroom_shade`, `flower_sun`, `classification`, `forest_habitat`.
+
 ## 9. Cara Menguji
 
-1. Buka `WhispersOfKnowledge.pde` di Processing 4, lalu Run. Di tab terlihat 15 file `.pde`. **Tidak boleh ada kotak merah** di layar (artinya semua file data valid).
-2. **Sebelum quest:** jalan ke timur melewati jalan cokelat sampai rumput lebih gelap. Notifikasi "Kamu memasuki Whispering Forest" muncul. Dekati lingkaran hijau di sekitar tile (22, 6): prompt `[E] Ambil Green Leaf`. Tekan E, masuk Inventory (I) dan Journal (J).
-3. Tekan **C**: layar Crafting menampilkan Herbal Tea dengan bahan `Green Leaf (1/2), Water (0/1)`. Tekan E: notifikasi "Bahan tidak cukup", inventory tidak berubah. Tekan C untuk menutup.
-4. **Terima quest:** dekati kotak oranye (penjaga taman), tekan E sampai muncul pilihan, pilih "Ya, aku akan membantu" dengan W/S lalu E. Cek Quest Log (Q): objective 1 dan 2 sudah `[x]`. Di kiri atas ada kotak "Tujuan: ..." yang mengikuti objective berikutnya.
-5. **Kumpulkan:** ambil Green Leaf kedua, Sunpetal, Moon Fern (objective tanaman selesai), lalu air di kolam. Air bisa diambil berulang.
-6. **Bicara sebelum siap:** dialog pengingat tampil ("Hutan ada di timur jalan...").
-7. **Crafting:** tekan C lalu E. Herbal Tea masuk inventory, bahan berkurang, notifikasi muncul, Journal bertambah entry resep.
-8. **Selesaikan:** bicara dengan penjaga taman. Dialog "Kamu membawa Herbal Tea!" tampil, quest selesai, dan muncul tiga notifikasi reward. Resep kedua (Garden Tonic) muncul di layar Crafting.
-9. **Reward tidak berulang:** bicara lagi dengan penjaga taman. Garden Seed tetap x1.
-10. Buka Journal: bila isinya panjang, W/S menggulir panel. ESC menutup dialog atau layar, atau menjeda permainan.
-0. **Main Menu:** saat game dibuka tampil menu. Tanpa data simpanan, pilihan awal adalah "Permainan Baru" dan "Lanjutkan" redup. Dengan data simpanan, pilihan awal adalah "Lanjutkan".
-11. **Simpan dan muat:** setelah menerima quest dan mengambil beberapa benda, tekan **F5** (notifikasi "Permainan disimpan."). Ambil benda lain, lalu tekan **F9**: inventory, Journal, quest, dan posisi kembali seperti saat F5, dan benda yang tadi diambil muncul lagi. Di layar Pause (ESC), **K** menyimpan dan **L** memuat. Folder `WhispersOfKnowledge/saves/` dibuat otomatis.
-12. **Muat di sesi baru:** tutup game, jalankan lagi, tekan F9 atau ESC lalu L. Progres harus kembali. Hapus `saves/save.json`, lalu F9: muncul pesan "Belum ada data simpanan."
+Langkah pengujian manual lengkap ada di [docs/TESTING.md](docs/TESTING.md): uji cepat untuk setiap pull request, alur utama, side quest, simpan dan muat, data dan aset, format laporan bug, dan syarat sebuah pull request boleh digabung.
 
 ## 10. Status Pengujian dan Batasan
 
-**Pengujian:** 172 pemeriksaan otomatis lulus (105 untuk data dan alur, 43 untuk Save/Load, 24 untuk Main Menu) dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. Save/Load: simpan di tengah quest lalu muat, muat di game baru, reward tidak berulang, 11 jenis file simpanan rusak ditolak tanpa mengubah game, penulisan gagal, dan tombol F5/F9/K/L. Main Menu: navigasi berputar, Lanjutkan tanpa save, Permainan Baru mereset semua progres, kembali ke menu dari Pause lalu Lanjutkan, dan Keluar. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai langkah di bagian 9.
+**Pengujian:** 231 pemeriksaan otomatis lulus (110 untuk data dan alur, 43 untuk Save/Load, 24 untuk Main Menu, 38 untuk konten side quest, 16 untuk pemuatan aset: tanpa aset, dengan aset, cadangan `player.png`, dan PNG rusak) dengan harness yang memakai stub API Processing: alur lengkap Forgotten Garden dari file JSON, peta dari file identik dengan peta cadangan, 8 jenis data rusak (file hilang, JSON terpotong, referensi salah, `next` di luar rentang, aksi salah, peta salah ukuran, trigger dan status tidak dikenal) menghasilkan pesan jelas tanpa crash, dan satu side quest + NPC kedua yang ditambahkan **hanya lewat JSON**. Save/Load: simpan di tengah quest lalu muat, muat di game baru, reward tidak berulang, 11 jenis file simpanan rusak ditolak tanpa mengubah game, penulisan gagal, dan tombol F5/F9/K/L. Main Menu: navigasi berputar, Lanjutkan tanpa save, Permainan Baru mereset semua progres, kembali ke menu dari Pause lalu Lanjutkan, dan Keluar. **Belum dijalankan di Processing asli** untuk versi ini. Verifikasi manual memakai [docs/TESTING.md](docs/TESTING.md).
 
 **Batasan yang diketahui:**
 

@@ -48,6 +48,34 @@
       "description": "Biji hadiah dari penjaga taman.",
       "category": "Quest Items",
       "icon": ""
+    },
+    {
+      "id": "wild_berry",
+      "name": "Beri Liar",
+      "description": "Buah kecil manis dari semak di sekitar desa.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "forest_mushroom",
+      "name": "Jamur Hutan",
+      "description": "Jamur yang tumbuh di tempat teduh dan lembap.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "wild_aster",
+      "name": "Bunga Aster",
+      "description": "Bunga yang suka sinar matahari.",
+      "category": "Plants",
+      "icon": ""
+    },
+    {
+      "id": "silver_coin",
+      "name": "Koin Perak",
+      "description": "Upah dari penduduk Greenhaven.",
+      "category": "Quest Items",
+      "icon": ""
     }
   ]
 }

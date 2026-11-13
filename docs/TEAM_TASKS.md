@@ -50,7 +50,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 | 4 | `Inventory` (add, remove, has, quantity tidak boleh negatif) dan `Pickup` (benda yang bisa diambil) |
 | 4 | `CraftingSystem` (cek bahan sebelum mengurangi item, resep terkunci) dan layar Crafting (tombol C) di `UI` |
 | 4 | `Journal` (registerEntry, discover, addEntry, hasEntry) |
-| 5 | Mengisi konten MVP lewat JSON: 3 NPC, side quest, item, dan entry Journal (`data/game-data/`, panduan di `docs/DATA_FORMAT.md`) |
+| 5 | Konten MVP draf sudah ada (3 NPC, 2 side quest, 11 item, 14 entry Journal). Tugas: tinjau dan perbaiki isi dan materi edukasinya langsung di `data/game-data/` (panduan di `docs/DATA_FORMAT.md`) |
 | 6 | Menyempurnakan tampilan `UI` setelah aset jadi (HUD, Inventory, Journal, Quest Log, Pause, Crafting, Main Menu dasar sudah ada) |
 
 ## Anggota 4: AI Asset & World Designer
@@ -59,7 +59,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 
 | Fase | Tugas |
 |---|---|
-| 1 | Tentukan gaya visual dan template prompt, uji satu sprite dan satu tile di Processing |
+| 1 | Tentukan gaya visual dan template prompt, uji satu sprite dan satu tile di Processing (jalur pemuatan gambar sudah siap: ikuti `docs/ASSET_GUIDE.md`) |
 | 5 | Sprite player dan 3 NPC, tileset desa dan hutan, object (pohon, tanaman, rumah) |
 | 5 | Layout map Greenhaven Village dan sebagian Whispering Forest dengan mengedit `rows` di `data/maps/greenhaven.json` (legenda karakter di `docs/DATA_FORMAT.md`) |
 | 5 | Ikon item dan elemen UI |

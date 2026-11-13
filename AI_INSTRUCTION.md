@@ -1,7 +1,7 @@
 AI PROJECT INSTRUCTIONS
 
 Project: Whispers of Knowledge
-Version: 1.5 (aligned with PRD v1.7)
+Version: 1.7 (aligned with PRD v1.10)
 
 1. PROJECT IDENTITY
 
@@ -89,6 +89,7 @@ Processing-specific:
 - Data files use JSON through Processing's built-in JSONObject and JSONArray. No extra library.
 - Game CONTENT (items, recipes, journal entries, quests, dialogues, NPCs, pickups, map) lives in JSON files under data/game-data/ and data/maps/, loaded by DataLoader. Never hard-code content in .pde files. Format: docs/DATA_FORMAT.md.
 - Anything that changes progress (new quest state, collected pickups, unlocked recipes, discovered entries, visited zones, NPC state) must also be written in SaveManager.saveGame and restored in loadGame/apply, and covered by a test. loadGame must validate the whole file first and leave the game unchanged on any problem.
+- Images are optional. Load them only through Assets.get(), which returns null for a missing or broken file, and always keep a placeholder fallback in render(). Asset names and sizes: docs/ASSET_GUIDE.md.
 - A bad data file must never crash the game. DataLoader reports a clear message (console prefix [DATA] and the red box on screen) and the game keeps running. Keep that behavior when adding new data types, and add a validation rule for every new cross-reference.
 - New quest trigger types or dialogue action commands need code. Add them in Game.isTriggerMet / Game.runAction, validate them in DataLoader, and document them in DATA_FORMAT.md and TECHNICAL_SPEC.md.
 

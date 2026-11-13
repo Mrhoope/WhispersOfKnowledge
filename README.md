@@ -5,7 +5,7 @@ Game edukasi **2D top-down pixel art adventure RPG** yang dibuat dengan **Proces
 Pemain menjelajahi dunia fantasi (desa, hutan, taman alkimia, perpustakaan), berbicara dengan NPC, menyelesaikan quest, dan melakukan crafting. Pembelajaran terjadi lewat aktivitas bermain, bukan sekadar tanya-jawab.
 
 > **Status:** Fase 2 terverifikasi. Skenario *The Forgotten Garden* dapat dimainkan dengan visual placeholder
-> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.7
+> (Fase 3 dan 4, menunggu verifikasi tim). Dokumen acuan: [PRD.md](PRD.md) v1.10
 
 ## Fitur MVP
 
@@ -68,16 +68,21 @@ WhispersOfKnowledge/                  <- root repo
 ├── TECHNICAL_SPEC.md
 ├── CONTRIBUTING.md
 ├── .gitignore
+├── tools/
+│   └── prepare_asset.py          <- menyiapkan gambar AI menjadi aset
 ├── docs/
 │   ├── TEAM_TASKS.md
-│   ├── DEVELOPMENT_LOG.md
+│   ├── DATA_FORMAT.md
+│   ├── ASSET_GUIDE.md
 │   ├── ASSET_CREDITS.md
+│   ├── asset-test/               <- aset contoh untuk uji
+│   ├── DEVELOPMENT_LOG.md
 │   └── TESTING.md
 └── WhispersOfKnowledge/              <- folder sketch Processing
     ├── WhispersOfKnowledge.pde
     ├── Game  Camera  Player  World          (.pde)
     ├── NPC  DialogueSystem  Pickup  UI      (.pde)
-    ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  DataLoader  (.pde)
+    ├── QuestManager  Inventory  CraftingSystem  Journal  SaveManager  DataLoader  Assets  (.pde)
     └── data/
         ├── sprites/  tilesets/  audio/  ui/
         ├── maps/        greenhaven.json
@@ -91,6 +96,8 @@ Catatan: Processing hanya mengenali file `.pde` di folder sketch dan aset di `da
 - [PRD.md](PRD.md): kebutuhan produk
 - [TECHNICAL_SPEC.md](TECHNICAL_SPEC.md): kontrak class
 - [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md): cara menambah NPC, quest, item, dan peta lewat file JSON
+- [docs/ASSET_GUIDE.md](docs/ASSET_GUIDE.md): nama, ukuran, dan cara memasang sprite dan tile
+- [docs/TESTING.md](docs/TESTING.md): daftar periksa pengujian sebelum pull request
 - [CONTRIBUTING.md](CONTRIBUTING.md): aturan kolaborasi tim
 - [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md): pembagian tugas
 - [docs/ASSET_CREDITS.md](docs/ASSET_CREDITS.md): catatan aset AI

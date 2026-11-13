@@ -20,6 +20,7 @@ class Game {
   CraftingSystem crafting;
   DialogueSystem dialogue;
   SaveManager saveManager;
+  Assets assets;
   UI ui;
 
   // isi data dari file
@@ -70,12 +71,41 @@ class Game {
 
     player = new Player(world.getStartX(), world.getStartY());
 
+    assets = new Assets();
+    applyAssets();
+
     state = GameState.MENU;
     menuSelected = saveManager.hasSave() ? 0 : 1;   // Lanjutkan bila ada simpanan
 
     if (!dataErrors.isEmpty()) {
       ui.showNotification("Ada " + dataErrors.size() + " masalah data. Lihat kotak merah.");
     }
+  }
+
+  // Memasang gambar bila filenya ada. Yang tidak ada tetap memakai placeholder.
+  // Aturan nama file: docs/ASSET_GUIDE.md
+  void applyAssets() {
+    world.setTileImages(
+      assets.get("tilesets/tile_grass.png"),
+      assets.get("tilesets/tile_grass_forest.png"),
+      assets.get("tilesets/tile_dirt.png"),
+      assets.get("tilesets/tile_water.png"),
+      assets.get("tilesets/object_tree.png"));
+
+    PImage any = assets.get("sprites/player.png");
+    player.setFallbackSprite(any);
+    player.setSprite(0, assets.get("sprites/player_idle_down.png"));
+    player.setSprite(1, assets.get("sprites/player_idle_up.png"));
+    player.setSprite(2, assets.get("sprites/player_idle_left.png"));
+    player.setSprite(3, assets.get("sprites/player_idle_right.png"));
+
+    for (NPC n : npcs) {
+      n.setSprite(assets.get("sprites/" + n.getId() + ".png"));
+    }
+    for (Pickup p : pickups) {
+      p.setSprite(assets.get("sprites/item_" + p.getItemId() + ".png"));
+    }
+    assets.printSummary();
   }
 
   // ---------- update dan render ----------

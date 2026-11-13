@@ -48,6 +48,55 @@
       "category": "Biology",
       "description": "Tanaman, serangga, jamur, dan air di taman saling membutuhkan.",
       "learningInfo": "Ekosistem adalah hubungan saling bergantung antara makhluk hidup dan lingkungannya."
+    },
+    {
+      "id": "berry_fruit",
+      "title": "Beri Liar",
+      "category": "Biology",
+      "description": "Beri adalah buah kecil yang mengandung biji.",
+      "learningInfo": "Hewan memakan buah lalu menyebarkan biji lewat kotorannya, sehingga tumbuhan baru dapat tumbuh di tempat lain."
+    },
+    {
+      "id": "fair_trade",
+      "title": "Berdagang yang Adil",
+      "category": "Social Interaction",
+      "description": "Pedagang dan pembeli sama-sama perlu merasa diuntungkan.",
+      "learningInfo": "Kesepakatan yang jujur dan saling menguntungkan membangun kepercayaan."
+    },
+    {
+      "id": "math_division",
+      "title": "Pembagian Rata",
+      "category": "Mathematics",
+      "description": "Membagi 6 beri ke 3 keranjang berarti setiap keranjang mendapat jumlah yang sama.",
+      "learningInfo": "6 ÷ 3 = 2. Pembagian adalah kebalikan dari perkalian: 3 × 2 = 6."
+    },
+    {
+      "id": "mushroom_shade",
+      "title": "Jamur Hutan",
+      "category": "Biology",
+      "description": "Jamur tumbuh di tempat teduh dan lembap, misalnya di tanah di bawah pohon.",
+      "learningInfo": "Jamur bukan tumbuhan. Ia tidak berfotosintesis, dan banyak jamur mengurai sisa makhluk hidup."
+    },
+    {
+      "id": "flower_sun",
+      "title": "Bunga Aster",
+      "category": "Biology",
+      "description": "Aster tumbuh subur di tempat terbuka yang terkena sinar matahari.",
+      "learningInfo": "Tanaman berbunga seperti aster membutuhkan banyak cahaya untuk berfotosintesis."
+    },
+    {
+      "id": "classification",
+      "title": "Mengelompokkan",
+      "category": "Logic",
+      "description": "Mengelompokkan berarti menyusun benda berdasarkan ciri yang sama.",
+      "learningInfo": "Contoh: tanaman dapat dikelompokkan menurut tempat tumbuhnya, yaitu teduh atau terang."
+    },
+    {
+      "id": "forest_habitat",
+      "title": "Habitat Hutan",
+      "category": "Biology",
+      "description": "Setiap makhluk hidup tumbuh di habitat yang cocok dengan kebutuhannya.",
+      "learningInfo": "Cahaya, kelembapan, dan tanah menentukan makhluk hidup apa yang dapat hidup di suatu tempat."
     }
   ]
 }
