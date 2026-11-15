@@ -70,6 +70,7 @@ Field: `menuSelected` (0 sampai 2), `world`, `camera`, `player`, `npcs`, `pickup
 | `Player(float x, float y)` | Posisi awal (pixel dunia) |
 | `void update(World world, int dirX, int dirY)` | `dirX`/`dirY` bernilai -1, 0, atau 1. Menggerakkan pemain dengan cek collision |
 | `void render()` | Menggambar pemain di koordinat dunia |
+| `void setAnimationSprites(int facingDir, PImage idleFrame2, PImage walkFrame1, PImage walkFrame2)` | Memasang frame animasi opsional untuk arah tertentu. Frame idle utama tetap dipasang dengan `setSprite`; gambar boleh `null` |
 | `float getX()` / `float getY()` | Posisi (kaki) |
 | `void setPosition(float x, float y)` | Dipakai oleh load game |
 
@@ -127,7 +128,7 @@ Field: `menuSelected` (0 sampai 2), `world`, `camera`, `player`, `npcs`, `pickup
 
 ### 3.7 `UI` (Anggota 3)
 
-UI hanya **menggambar**. Data dan logika tetap di class masing-masing.
+UI hanya **menggambar**. Data dan logika tetap di class masing-masing. Tampilan memakai gaya pixel-art cozy orisinal: panel krem, bingkai cokelat, aksen hijau, dan kontras teks yang mudah dibaca. Jangan menyalin aset atau tata letak spesifik dari game lain. Settings screen belum termasuk kontrak maupun fitur yang ada.
 
 | Method | Keterangan |
 |---|---|

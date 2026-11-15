@@ -16,6 +16,22 @@ Saat game dijalankan, console Processing menampilkan daftar gambar yang terpakai
 
 Bila gambar tidak muncul di daftar, berarti nama file atau lokasinya belum tepat. File gambar yang rusak diabaikan (tidak membuat game crash).
 
+## Cara cepat (disarankan)
+
+1. Buka `docs/ASSET_PROMPTS.md`: ada daftar semua aset beserta prompt siap tempel.
+2. Generate gambar dengan AI (besar, latar putih polos). Simpan di folder **`art_raw/`** di root repo dengan **nama final**, contoh `art_raw/npc_gardener.png`.
+3. Jalankan (butuh Python dan `pip install pillow`):
+   ```text
+   python tools/batch_prepare.py --transparent "#ffffff" --colors 16
+   ```
+   Skrip memotong, membuat latar transparan, memperkecil, mengurangi warna, menaruh file di folder `data/` yang benar, dan membuat **pratinjau diperbesar** di `art_preview/`. Arah kiri pemain dibuat otomatis dengan membalik arah kanan.
+4. Buka pratinjau, lalu jalankan game dan lihat hasilnya. Ulangi untuk gambar yang kurang bagus.
+5. Folder `art_raw/` dan `art_preview/` tidak ikut ke Git (sudah di `.gitignore`). Yang di-commit hanya hasil di `data/`.
+
+Opsi: `--only npc_gardener` memproses satu aset saja, `--method nearest` untuk gambar yang sudah pixel art 16 px, `--tolerance 60` bila tepi putih masih tersisa.
+
+Bagian di bawah menjelaskan nama file dan ukuran bila Anda mau memproses manual dengan `tools/prepare_asset.py`.
+
 ## Nama file, lokasi, dan ukuran
 
 Semua format **PNG**. Sprite harus **transparan** di sekitar karakter. Tile tidak transparan.
@@ -28,6 +44,8 @@ Semua format **PNG**. Sprite harus **transparan** di sekitar karakter. Tile tida
 | Air | `data/tilesets/tile_water.png` | 16×16 |
 | Pohon (digambar di atas rumput, bagian bawah gambar sejajar bawah tile) | `data/tilesets/object_tree.png` | 16×16 sampai 16×32 |
 | Player menghadap bawah / atas / kiri / kanan | `data/sprites/player_idle_down.png`, `player_idle_up.png`, `player_idle_left.png`, `player_idle_right.png` | 16×24 atau 16×32 |
+| Frame idle kedua (opsional; untuk animasi kedip/napas) | `data/sprites/player_idle_<arah>_2.png` | Sama dengan sprite idle arah itu |
+| Dua frame jalan per arah (opsional) | `data/sprites/player_walk_<arah>_1.png`, `player_walk_<arah>_2.png` | 16×24 atau 16×32 |
 | Player (cadangan untuk arah yang belum punya gambar) | `data/sprites/player.png` | 16×24 atau 16×32 |
 | NPC | `data/sprites/<id NPC>.png` | 16×24 atau 16×32 |
 | Benda di dunia | `data/sprites/item_<id item>.png` | 16×16 |
@@ -43,6 +61,10 @@ Nama NPC mengikuti `id` di `data/game-data/npcs.json`:
 Nama benda mengikuti `id` item di `items.json`: `item_green_leaf.png`, `item_sunpetal.png`, `item_moon_fern.png`, `item_water.png`, `item_wild_berry.png`, `item_forest_mushroom.png`, `item_wild_aster.png`.
 
 **Titik pegangan sprite:** kaki karakter berada di tengah-bawah gambar. Sprite digambar dengan tengah-bawahnya di posisi karakter, jadi gambar yang lebih tinggi otomatis naik ke atas.
+
+### Animasi pemain
+
+Animasi memakai dua frame PNG terpisah untuk setiap arah (`down`, `up`, `left`, `right`). Sprite idle utama yang sudah ada menjadi frame pertama; frame `player_idle_<arah>_2.png` memberi variasi idle singkat. Saat bergerak, game mengganti dua gambar `player_walk_<arah>_1.png` dan `player_walk_<arah>_2.png`. Frame jalan berganti sekitar tujuh kali per detik; variasi idle berkedip singkat secara berkala. Jika gambar jalan tidak ada, game memakai sprite idle arah tersebut; jika gambar idle juga tidak ada, game tetap memakai fallback atau placeholder.
 
 ## Menguji satu sprite dan satu tile (tugas Fase 1 Anggota 4)
 
@@ -94,4 +116,4 @@ Tips: minta **latar putih polos** agar mudah dijadikan transparan. Hindari bayan
 
 ## Belum didukung (rencana)
 
-Animasi berjalan (`player_walk_*`), ikon item di Inventory (`ui/`), ganti tile otomatis di tepi (autotile), dan dekorasi bertumpuk. Bila dibutuhkan, bicarakan dengan Anggota 1 dan 2 dulu.
+Ikon item di Inventory (`ui/`), ganti tile otomatis di tepi (autotile), dan dekorasi bertumpuk. Bila dibutuhkan, bicarakan dengan Anggota 1 dan 2 dulu.

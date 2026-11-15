@@ -8,3 +8,7 @@ saves/
 # File sistem
 Thumbs.db
 .DS_Store
+
+# Gambar mentah dan pratinjau aset (tidak ikut Git)
+art_raw/
+art_preview/
