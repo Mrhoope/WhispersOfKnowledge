@@ -14,6 +14,7 @@ Kontrol: WASD atau panah (gerak), E (interaksi, konfirmasi), W/S (pilih dan guli
 | A4 | Tekan I, J, Q, C satu per satu | Tiap layar terbuka dan tertutup dengan tombol yang sama atau ESC |
 | A5 | Bicara dengan Penjaga Taman (E) | Dialog tampil, pilihan bisa dipilih dengan W/S lalu E |
 | A6 | F5 lalu F9 | Muncul "Permainan disimpan." lalu "Permainan dimuat." |
+| A7 | Periksa Main Menu, HUD, dialog, Inventory, Journal, Quest Log, Crafting, Pause, dan notifikasi | Semua layar memakai palet/panel yang konsisten, teks tetap terbaca, kontrol dan informasi lama tetap tersedia |
 
 Bila ada langkah yang gagal, **jangan** buat pull request. Perbaiki dulu atau laporkan (bagian F).
 
@@ -59,6 +60,7 @@ Bila ada langkah yang gagal, **jangan** buat pull request. Perbaiki dulu atau la
 | E2 | Sengaja hapus satu koma di `items.json`, jalankan | Kotak merah: "items.json: tidak bisa dibaca...". Game tetap jalan. **Kembalikan filenya** |
 | E3 | Tambah gambar di `data/sprites/` atau `data/tilesets/` | Console menampilkan `[ASET] ...`, gambar tampil di game |
 | E4 | Ganti nama file gambar menjadi salah | Kembali ke placeholder, tidak ada error |
+| E5 | Mulai permainan, diam sejenak lalu bergerak bergantian ke empat arah | Idle berganti frame pelan; saat bergerak animasi langkah berubah sesuai arah, lalu kembali idle saat berhenti |
 
 Bila save lama ditolak setelah mengubah ID di JSON, itu normal: hapus `saves/save.json`.
 

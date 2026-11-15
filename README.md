@@ -69,11 +69,13 @@ WhispersOfKnowledge/                  <- root repo
 ├── CONTRIBUTING.md
 ├── .gitignore
 ├── tools/
-│   └── prepare_asset.py          <- menyiapkan gambar AI menjadi aset
+│   ├── batch_prepare.py          <- memproses semua gambar mentah AI sekaligus
+│   └── prepare_asset.py          <- memproses satu gambar
 ├── docs/
 │   ├── TEAM_TASKS.md
 │   ├── DATA_FORMAT.md
 │   ├── ASSET_GUIDE.md
+│   ├── ASSET_PROMPTS.md          <- daftar aset dan prompt AI
 │   ├── ASSET_CREDITS.md
 │   ├── asset-test/               <- aset contoh untuk uji
 │   ├── DEVELOPMENT_LOG.md
@@ -97,6 +99,7 @@ Catatan: Processing hanya mengenali file `.pde` di folder sketch dan aset di `da
 - [TECHNICAL_SPEC.md](TECHNICAL_SPEC.md): kontrak class
 - [docs/DATA_FORMAT.md](docs/DATA_FORMAT.md): cara menambah NPC, quest, item, dan peta lewat file JSON
 - [docs/ASSET_GUIDE.md](docs/ASSET_GUIDE.md): nama, ukuran, dan cara memasang sprite dan tile
+- [docs/ASSET_PROMPTS.md](docs/ASSET_PROMPTS.md): daftar semua aset dan prompt AI siap tempel
 - [docs/TESTING.md](docs/TESTING.md): daftar periksa pengujian sebelum pull request
 - [CONTRIBUTING.md](CONTRIBUTING.md): aturan kolaborasi tim
 - [docs/TEAM_TASKS.md](docs/TEAM_TASKS.md): pembagian tugas

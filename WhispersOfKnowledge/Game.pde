@@ -98,6 +98,22 @@ class Game {
     player.setSprite(1, assets.get("sprites/player_idle_up.png"));
     player.setSprite(2, assets.get("sprites/player_idle_left.png"));
     player.setSprite(3, assets.get("sprites/player_idle_right.png"));
+    player.setAnimationSprites(0,
+      assets.get("sprites/player_idle_down_2.png"),
+      assets.get("sprites/player_walk_down_1.png"),
+      assets.get("sprites/player_walk_down_2.png"));
+    player.setAnimationSprites(1,
+      assets.get("sprites/player_idle_up_2.png"),
+      assets.get("sprites/player_walk_up_1.png"),
+      assets.get("sprites/player_walk_up_2.png"));
+    player.setAnimationSprites(2,
+      assets.get("sprites/player_idle_left_2.png"),
+      assets.get("sprites/player_walk_left_1.png"),
+      assets.get("sprites/player_walk_left_2.png"));
+    player.setAnimationSprites(3,
+      assets.get("sprites/player_idle_right_2.png"),
+      assets.get("sprites/player_walk_right_1.png"),
+      assets.get("sprites/player_walk_right_2.png"));
 
     for (NPC n : npcs) {
       n.setSprite(assets.get("sprites/" + n.getId() + ".png"));
@@ -111,7 +127,10 @@ class Game {
   // ---------- update dan render ----------
 
   void update() {
-    if (state != GameState.PLAYING) return;
+    if (state != GameState.PLAYING) {
+      player.update(world, 0, 0);
+      return;
+    }
 
     int dx = 0;
     int dy = 0;

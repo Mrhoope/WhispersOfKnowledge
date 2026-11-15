@@ -59,7 +59,7 @@ Branch `feature/inventory-crafting`, `feature/npc-journal`, dan `feature/ai-asse
 
 | Fase | Tugas |
 |---|---|
-| 1 | Tentukan gaya visual dan template prompt, uji satu sprite dan satu tile di Processing (jalur pemuatan gambar sudah siap: ikuti `docs/ASSET_GUIDE.md`) |
+| 1 | Tentukan gaya visual dan template prompt, uji satu sprite dan satu tile di Processing (jalur pemuatan gambar sudah siap: ikuti `docs/ASSET_GUIDE.md` dan `docs/ASSET_PROMPTS.md`). Catatan: tugas ini dikerjakan oleh Anggota 1 (project lead) untuk efisiensi |
 | 5 | Sprite player dan 3 NPC, tileset desa dan hutan, object (pohon, tanaman, rumah) |
 | 5 | Layout map Greenhaven Village dan sebagian Whispering Forest dengan mengedit `rows` di `data/maps/greenhaven.json` (legenda karakter di `docs/DATA_FORMAT.md`) |
 | 5 | Ikon item dan elemen UI |

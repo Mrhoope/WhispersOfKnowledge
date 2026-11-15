@@ -7,7 +7,8 @@ class Player {
   float speed = 1.2;     // pixel dunia per frame
   int facing = 0;        // 0 bawah, 1 atas, 2 kiri, 3 kanan
   boolean moving = false;
-  PImage[] sprites = new PImage[4];   // per arah hadap (0 bawah, 1 atas, 2 kiri, 3 kanan)
+  PImage[][] idleSprites = new PImage[4][2];
+  PImage[][] walkSprites = new PImage[4][2];
   PImage spriteAny = null;            // cadangan bila arah tertentu tidak punya gambar
 
   // kotak collision di sekitar kaki
@@ -20,8 +21,8 @@ class Player {
   }
 
   void update(World world, int dirX, int dirY) {
-    moving = (dirX != 0 || dirY != 0);
-    if (!moving) return;
+    moving = false;
+    if (dirX == 0 && dirY == 0) return;
 
     if (dirY < 0) facing = 1;
     if (dirY > 0) facing = 0;
@@ -33,9 +34,13 @@ class Player {
     float vx = dirX / len * speed;
     float vy = dirY / len * speed;
 
+    float oldX = x;
+    float oldY = y;
+
     // cek sumbu X dan Y terpisah supaya bisa meluncur di sepanjang dinding
     if (!collides(world, x + vx, y)) x += vx;
     if (!collides(world, x, y + vy)) y += vy;
+    moving = (x != oldX || y != oldY);
   }
 
   boolean collides(World world, float nx, float ny) {
@@ -47,7 +52,15 @@ class Player {
 
   // Mengatur gambar untuk satu arah hadap. img boleh null.
   void setSprite(int facingDir, PImage img) {
-    if (facingDir >= 0 && facingDir < 4) sprites[facingDir] = img;
+    if (facingDir >= 0 && facingDir < 4) idleSprites[facingDir][0] = img;
+  }
+
+  // Memasang frame tambahan idle dan dua frame jalan untuk satu arah hadap.
+  void setAnimationSprites(int facingDir, PImage idleFrame2, PImage walkFrame1, PImage walkFrame2) {
+    if (facingDir < 0 || facingDir >= 4) return;
+    idleSprites[facingDir][1] = idleFrame2;
+    walkSprites[facingDir][0] = walkFrame1;
+    walkSprites[facingDir][1] = walkFrame2;
   }
 
   void setFallbackSprite(PImage img) {
@@ -56,7 +69,19 @@ class Player {
 
   // Memakai sprite bila ada, kalau tidak ada: placeholder kotak biru.
   void render() {
-    PImage img = (sprites[facing] != null) ? sprites[facing] : spriteAny;
+    PImage img;
+    if (moving) {
+      int frame = (millis() / 140) % 2;
+      img = walkSprites[facing][frame];
+      if (img == null) img = walkSprites[facing][1 - frame];
+      if (img == null) img = idleSprites[facing][0];
+      if (img == null) img = idleSprites[facing][1];
+    } else {
+      int idleFrame = (millis() % 1800 < 120) ? 1 : 0;
+      img = idleSprites[facing][idleFrame];
+      if (img == null) img = idleSprites[facing][1 - idleFrame];
+    }
+    if (img == null) img = spriteAny;
     if (img != null) {
       image(img, x - img.width / 2.0, y - img.height);
       return;

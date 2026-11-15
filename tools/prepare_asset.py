@@ -12,6 +12,9 @@ Opsi:
   --trim             potong tepi transparan dulu, supaya objek memenuhi gambar
   --transparent HEX  jadikan warna latar ini transparan (contoh "#ffffff")
   --tolerance N      seberapa mirip warna dianggap latar (0 sampai 255, bawaan 30)
+  --method M         cara memperkecil: "box" (rata-rata area, bawaan, cocok untuk gambar AI)
+                     atau "nearest" (tajam, untuk gambar yang sudah pixel art)
+  --colors N         kurangi jumlah warna menjadi N (contoh 24) agar tampak seperti pixel art
 
 Perhatian: skrip ini memperkecil dengan metode NEAREST (tanpa menghaluskan) agar pixel tetap tajam.
 Hasilnya SELALU harus dilihat dan diperiksa. Memperkecil gambar AI yang detailnya halus
@@ -51,6 +54,35 @@ def make_transparent(img, color, tolerance):
                 px[x, y] = (r, g, b, 0)
 
 
+def quantize(img, colors):
+    """Mengurangi warna. Transparansi dibuat tegas (penuh atau kosong) agar tidak ada tepi pudar."""
+    alpha = img.getchannel("A").point(lambda v: 255 if v > 127 else 0)
+    rgb = img.convert("RGB").quantize(colors=colors, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).convert("RGB")
+    out = rgb.convert("RGBA")
+    out.putalpha(alpha)
+    return out
+
+
+def process(img, size, trim=False, transparent=None, tolerance=30, method="box", colors=0, log=print):
+    """Mengubah gambar mentah menjadi gambar berukuran size (w, h). Mengembalikan gambar RGBA."""
+    w, h = size
+    img = img.convert("RGBA")
+    if transparent:
+        make_transparent(img, transparent, tolerance)
+    if trim:
+        box = img.getchannel("A").getbbox()
+        if box is None:
+            raise ValueError("gambar kosong (semua transparan), periksa warna latar dan toleransi")
+        img = img.crop(box)
+    if abs(img.width / img.height - w / h) > 0.15:
+        log("PERINGATAN: perbandingan lebar:tinggi gambar berbeda dengan target. Hasil akan melar.")
+    resample = Image.NEAREST if method == "nearest" else Image.BOX
+    out = img.resize((w, h), resample)
+    if colors:
+        out = quantize(out, colors)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description="Menyiapkan aset game dari gambar AI.")
     ap.add_argument("masuk")
@@ -59,27 +91,18 @@ def main():
     ap.add_argument("--trim", action="store_true")
     ap.add_argument("--transparent")
     ap.add_argument("--tolerance", type=int, default=30)
+    ap.add_argument("--method", choices=["box", "nearest"], default="box")
+    ap.add_argument("--colors", type=int, default=0)
     a = ap.parse_args()
 
     w, h = parse_size(a.size)
-    img = Image.open(a.masuk).convert("RGBA")
+    img = Image.open(a.masuk)
     print("Ukuran asli:", img.width, "x", img.height)
-
-    if a.transparent:
-        make_transparent(img, parse_hex(a.transparent), a.tolerance)
-    if a.trim:
-        box = img.getchannel("A").getbbox()
-        if box is None:
-            sys.exit("Gambar kosong (semua transparan). Periksa --transparent dan --tolerance.")
-        img = img.crop(box)
-        print("Setelah dipotong:", img.width, "x", img.height)
-
-    if abs(img.width / img.height - w / h) > 0.15:
-        print("PERINGATAN: perbandingan lebar:tinggi gambar berbeda dengan target. Hasil akan melar.")
-    if img.width % w or img.height % h:
-        print("PERINGATAN: ukuran asli bukan kelipatan bulat dari target. Hasil bisa terlihat tidak rata.")
-
-    out = img.resize((w, h), Image.NEAREST)
+    try:
+        out = process(img, (w, h), a.trim, parse_hex(a.transparent) if a.transparent else None,
+                      a.tolerance, a.method, a.colors)
+    except ValueError as e:
+        sys.exit("Gagal: " + str(e))
     out.save(a.keluar)
     print("Disimpan:", a.keluar, "(", w, "x", h, ")")
     print("Langkah berikutnya: buka hasilnya, perbesar, dan pastikan masih terbaca.")
